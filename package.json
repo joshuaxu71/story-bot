@@ -1,0 +1,15 @@
+{
+  "name": "korean-gibberish-translator",
+  "version": "1.0.0",
+  "description": "A discord bot that will translate any Korean/English gibberish caused by not switching languages.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "joshuaxu71",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5"
+  }
+}
