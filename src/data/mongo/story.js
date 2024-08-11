@@ -17,20 +17,66 @@ async function insertStory(story) {
     }
 }
 
-async function archiveStory(message) {
+async function getStoriesByGuildId(guildId) {
     try {
         const db = await connectToDatabase();
         const collection = db.collection(collection_name);
 
-        await collection.findOneAndUpdate(
-            {guildId: message.guildId},
-            {
-                $set: {
-                    title: message.content,
-                    archived: true,
-                }
-            },
-        );
+        const stories = await collection.find({guildId: guildId})
+            .sort({createdDate: 1})
+            .toArray();
+        return stories;
+    } catch (err) {
+        console.error('Error getStoriesByGuildId:', err);
+    }
+}
+
+async function getOngoingStoryByGuildId(guildId) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        return await collection.findOne({ guildId: guildId, archived: false });
+    } catch (err) {
+        console.error('Error getOngoingStoryByGuildId:', err);
+    }
+}
+
+async function getStoryByGuildIdAndIdentifier(guildId, guildStoryIdentifier) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        return await collection.findOne({guildId: guildId, guildStoryIdentifier: guildStoryIdentifier});
+    } catch (err) {
+        console.error('Error getStoryByGuildIdAndIdentifier:', err);
+    }
+}
+
+async function archiveStory(guildId, title) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        const latestStory = await collection.find({ guildId: guildId, archived: false })
+            .sort({ createdDate: -1 })
+            .limit(1)
+            .toArray();
+
+        if (latestStory.length) {
+            await collection.findOneAndUpdate(
+                { _id: latestStory[0]._id },
+                {
+                    $set: {
+                        title: title,
+                        archived: true,
+                    }
+                },
+            );
+            return `The ongoing story has been archived with the title \`${title}\``;
+        } else {
+            return `There is no ongoing story to archive.`;
+        }        
     } catch (err) {
         console.error('Error archiveStory:', err);
     }
@@ -70,6 +116,21 @@ async function updateStoryLastModifiedData(storyInput) {
     }
 }
 
+async function updateStoryReplyId(storyId, messageId) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        collection.findOneAndUpdate(
+            { _id: storyId },
+            { $set: { replyId: messageId }},
+        );
+    } catch (err) {
+        console.error("Error updateStoryReplyId:", err);
+        return null;
+    }
+}
+
 async function generateGuildStoryIdentifier(guildId) {
     try {
         const db = await connectToDatabase();
@@ -92,7 +153,11 @@ async function generateGuildStoryIdentifier(guildId) {
 
 module.exports = {
     insertStory,
+    getStoryByGuildIdAndIdentifier,
+    getOngoingStoryByGuildId,
     archiveStory,
     findFirstOngoingStoryByGuildId,
-    updateStoryLastModifiedData
+    updateStoryLastModifiedData,
+    getStoriesByGuildId,
+    updateStoryReplyId
 }

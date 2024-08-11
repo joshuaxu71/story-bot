@@ -31,6 +31,20 @@ async function insertStoryInput(storyInput) {
     }
 }
 
+async function getStoryInputsByStoryId(storyId) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        return await collection.find({storyId: storyId})
+            .sort({createdDate: 1})
+            .toArray();
+    } catch (err) {
+        console.error('Error getStoryContentByStoryId:', err);
+    }
+}
+
 module.exports = {
-    insertStoryInput
+    insertStoryInput,
+    getStoryInputsByStoryId
 }

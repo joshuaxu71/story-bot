@@ -16,6 +16,8 @@
     "story-bot": "file:"
   },
   "_moduleAliases": {
+    "@app": "src/app",
+    "@commands": "src/commands",
     "@data": "src/data",
     "@model": "src/model"
   }
