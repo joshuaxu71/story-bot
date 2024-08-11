@@ -1,11 +1,11 @@
 require('dotenv').config();
 require('module-alias/register');
-const { Client, GatewayIntentBits, Events, Collection } = require('discord.js');
+const { Client, GatewayIntentBits, Events, Collection, ReplyMessageOptions } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const { getStoryTitles } = require('@data/mongo/story.js');
 const { insertStoryInput } = require('@data/mongo/storyInput.js');
-const { getStory } = require('@app/story.js');
+const { getOngoingStory } = require('@app/story.js');
 const StoryInput = require('@model/storyInput.js');
 
 const client = new Client({ intents: [
@@ -36,16 +36,17 @@ client.on('messageCreate', async (message) => {
     if (message.author.bot) return; // Ignore bot messages
     const storyInput = new StoryInput(message);
     await insertStoryInput(storyInput);
-
-    if (message.content === "3") {
-        console.log("here");
-        message.reply(await getStoryTitles(message));
-    }
+    message.reply({
+        content: await getOngoingStory(message.guildId),
+        allowedMentions: {
+            repliedUser: false
+        }
+    });
 });
 
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isCommand()) return;
-    
+
     const command = interaction.client.commands.get(interaction.commandName);
 
     if (!command) {
