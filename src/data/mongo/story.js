@@ -17,6 +17,35 @@ async function insertStory(story) {
     }
 }
 
+async function getStoryTitles(message) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        const stories = await collection.find({guildId: message.guildId})
+            .sort({createdDate: 1})
+            .toArray();
+
+        storyTitles = []
+        if (stories.length) {
+            for (const story of stories) {
+                if (!story.title) {
+                    story.title = "<<ongoing story>>"
+                }
+                storyTitles.push(`${story.guildStoryIdentifier}. ${story.title}`)
+            }
+        }
+
+        if (!storyTitles.length) {
+            storyTitles.push("There are no stories yet.")
+        }
+
+        return storyTitles.join("\n");
+    } catch (err) {
+        console.error('Error getStoryTitles:', err);
+    }
+}
+
 async function getStoryByGuildIdAndIdentifier(message) {
     try {
         const db = await connectToDatabase();
@@ -106,5 +135,6 @@ module.exports = {
     getStoryByGuildIdAndIdentifier,
     archiveStory,
     findFirstOngoingStoryByGuildId,
-    updateStoryLastModifiedData
+    updateStoryLastModifiedData,
+    getStoryTitles
 }

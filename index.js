@@ -3,7 +3,7 @@ require('module-alias/register');
 
 const { Client, GatewayIntentBits } = require('discord.js');
 
-// const { getStory } = require('@data/mongo/story.js');
+const { getStoryTitles } = require('@data/mongo/story.js');
 const { insertStoryInput } = require('@data/mongo/storyInput.js');
 const { getStory } = require('@app/story.js');
 const StoryInput = require('@model/storyInput.js');
@@ -22,7 +22,12 @@ client.on('messageCreate', async (message) => {
     if (message.author.bot) return; // Ignore bot messages
     const storyInput = new StoryInput(message)
     insertStoryInput(storyInput);
-    message.reply(await getStory(message));
+    // message.reply(await getStory(message));
+
+    if (message.content === "3") {
+        console.log("here");
+        message.reply(await getStoryTitles(message));
+    }
 });
 
 client.login(process.env.CLIENT_TOKEN);
