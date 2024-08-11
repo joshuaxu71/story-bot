@@ -27,7 +27,7 @@ async function insertStoryInput(storyInput) {
         await collection.insertOne(storyInput);    
         await updateStoryLastModifiedData(storyInput);    
     } catch (err) {
-        console.error('Error inserting document:', err);
+        console.error('Error insertStoryInput:', err);
     }
 }
 

@@ -12,7 +12,7 @@ async function insertStory(story) {
         const result = await collection.insertOne(story);
         return result.insertedId;
     } catch (err) {
-        console.error('Error inserting document:', err);
+        console.error('Error insertStory:', err);
     }
 }
 
@@ -30,7 +30,7 @@ async function archiveStory(message) {
             },
         );
     } catch (err) {
-        console.error('Error archiving story:', err);
+        console.error('Error archiveStory:', err);
     }
 }
 
@@ -42,7 +42,7 @@ async function findFirstStoryByGuildId(guildId) {
         const document = await collection.findOne({guildId: guildId, archived: false});
         return document;
     } catch (err) {
-        console.error('Error finding document:', err);
+        console.error('Error findFirstStoryByGuildId:', err);
         return null;
     }
 }
@@ -63,7 +63,7 @@ async function updateStoryLastModifiedData(storyInput) {
         );
         return document;
     } catch (err) {
-        console.error('Error finding document:', err);
+        console.error("Error updateStoryLastModifiedData:", err);
         return null;
     }
 }
