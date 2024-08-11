@@ -42,12 +42,12 @@ async function getOngoingStoryByGuildId(guildId) {
     }
 }
 
-async function getStoryByGuildIdAndIdentifier(message) {
+async function getStoryByGuildIdAndIdentifier(guildId, guildStoryIdentifier) {
     try {
         const db = await connectToDatabase();
         const collection = db.collection(collection_name);
 
-        return await collection.findOne({guildId: message.guildId, guildStoryIdentifier: parseInt(message.content)});
+        return await collection.findOne({guildId: guildId, guildStoryIdentifier: guildStoryIdentifier});
     } catch (err) {
         console.error('Error getStoryByGuildIdAndIdentifier:', err);
     }

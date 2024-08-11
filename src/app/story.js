@@ -46,9 +46,9 @@ async function removePreviousStoryReply(client, channelId, replyId) {
     }
 }
 
-async function getStory(message) {
+async function getStoryContentByIdentifier(guildId, guildStoryIdentifier) {
     try {
-        const story = await getStoryByGuildIdAndIdentifier(message);
+        const story = await getStoryByGuildIdAndIdentifier(guildId, guildStoryIdentifier);
         var storyContent = "";
         if (story) {
             const storyInputs = await getStoryInputsByStoryId(story._id);
@@ -64,12 +64,12 @@ async function getStory(message) {
         }
         return storyContent;
     } catch (err) {
-        console.error('Error getStory:', err);
+        console.error('Error getStoryContentByIdentifier:', err);
     }
 }
 
 module.exports = {
-    getStory,
+    getStoryContentByIdentifier,
     getOngoingStory,
     setStoryReplyId
 }
