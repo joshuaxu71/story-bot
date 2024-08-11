@@ -7,6 +7,7 @@ async function insertStory(story) {
         const db = await connectToDatabase();
         const collection = db.collection(collection_name);
 
+        story.guildStoryIdentifier = await generateGuildStoryIdentifier(story.guildId);
         story.createdDate = new Date();
         story.lastModifiedDate = new Date();
         const result = await collection.insertOne(story);
@@ -34,7 +35,7 @@ async function archiveStory(message) {
     }
 }
 
-async function findFirstStoryByGuildId(guildId) {
+async function findFirstOngoingStoryByGuildId(guildId) {
     try {
         const db = await connectToDatabase();
         const collection = db.collection(collection_name);
@@ -68,9 +69,29 @@ async function updateStoryLastModifiedData(storyInput) {
     }
 }
 
+async function generateGuildStoryIdentifier(guildId) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        const latestStory = await collection.find({guildId: guildId})
+            .sort({createdDate: -1})
+            .limit(1)
+            .toArray();
+        var guildStoryIdentifier = 1
+        if (latestStory.length) {
+            guildStoryIdentifier = latestStory[0].guildStoryIdentifier + 1
+        }
+        
+        return guildStoryIdentifier;
+    } catch (err) {
+        console.error('Error insertStory:', err);
+    }
+}
+
 module.exports = {
     insertStory,
     archiveStory,
-    findFirstStoryByGuildId,
+    findFirstOngoingStoryByGuildId,
     updateStoryLastModifiedData
 }

@@ -1,5 +1,6 @@
 class Story {
     guildId;
+    guildStoryIdentifier;
     channelId;
     archived = false;
     createdDate;
