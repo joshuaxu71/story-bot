@@ -1,6 +1,9 @@
 require('dotenv').config(); //initialize dotenv
+require('module-alias/register');
 
 const { Client, GatewayIntentBits } = require('discord.js');
+
+const { insertDocument } = require('@data/mongo/storyInput.js');
 
 const client = new Client({ intents: [
     GatewayIntentBits.Guilds,
@@ -14,7 +17,9 @@ client.on('ready', () => {
 
 client.on('messageCreate', (message) => {
     if (message.author.bot) return; // Ignore bot messages
-    message.reply(`Message received: ${message.content}`);
+    console.log(message.author)
 });
 
 client.login(process.env.CLIENT_TOKEN);
+
+insertDocument();
