@@ -16,6 +16,24 @@ async function insertStory(story) {
     }
 }
 
+async function archiveStory(message) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        await collection.findOneAndUpdate(
+            {guildId: message.guildId},
+            {
+                $set: {
+                    archived: true,
+                }
+            },
+        );
+    } catch (err) {
+        console.error('Error archiving story:', err);
+    }
+}
+
 async function findFirstStoryByGuildId(guildId) {
     try {
         const db = await connectToDatabase();
@@ -52,6 +70,7 @@ async function updateStoryLastModifiedData(storyInput) {
 
 module.exports = {
     insertStory,
+    archiveStory,
     findFirstStoryByGuildId,
     updateStoryLastModifiedData
 }
