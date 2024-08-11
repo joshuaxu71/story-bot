@@ -42,20 +42,30 @@ async function getStoryByGuildIdAndIdentifier(message) {
     }
 }
 
-async function archiveStory(message) {
+async function archiveStory(guildId, title) {
     try {
         const db = await connectToDatabase();
         const collection = db.collection(collection_name);
 
-        await collection.findOneAndUpdate(
-            {guildId: message.guildId},
-            {
-                $set: {
-                    title: message.content,
-                    archived: true,
-                }
-            },
-        );
+        const latestStory = await collection.find({ guildId: guildId, archived: false })
+            .sort({ createdDate: -1 })
+            .limit(1)
+            .toArray();
+
+        if (latestStory.length) {
+            await collection.findOneAndUpdate(
+                { _id: latestStory[0]._id },
+                {
+                    $set: {
+                        title: title,
+                        archived: true,
+                    }
+                },
+            );
+            return `The ongoing story has been archived with the title \`${title}\``;
+        } else {
+            return `There is no ongoing story to archive.`;
+        }        
     } catch (err) {
         console.error('Error archiveStory:', err);
     }
