@@ -34,8 +34,7 @@ client.on('ready', () => {
 
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return; // Ignore bot messages
-    const storyInput = new StoryInput(message);
-    await insertStoryInput(storyInput);
+    await insertStoryInput(message);
     const reply = await message.reply({
         content: await getOngoingStory(message.guildId),
         allowedMentions: {

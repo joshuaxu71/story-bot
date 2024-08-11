@@ -1,16 +1,18 @@
 const { connectToDatabase } = require('@data/mongo.js');
 
 const Story = require('@model/story.js');
+const StoryInput = require('@model/storyInput.js');
 
 const { insertStory, findFirstOngoingStoryByGuildId, updateStoryLastModifiedData } = require('@data/mongo/story.js');
 
 const collection_name = 'story_inputs';
 
-async function insertStoryInput(storyInput) {
+async function insertStoryInput(message) {
     try {
         const db = await connectToDatabase();
         const collection = db.collection(collection_name);
 
+        const storyInput = new StoryInput(message);
         const story = await findFirstOngoingStoryByGuildId(storyInput.guildId)
         if (story) {
             storyInput.storyId = story._id
@@ -25,7 +27,7 @@ async function insertStoryInput(storyInput) {
 
         storyInput.createdDate = new Date();
         await collection.insertOne(storyInput);    
-        await updateStoryLastModifiedData(storyInput);    
+        await updateStoryLastModifiedData(storyInput);
     } catch (err) {
         console.error('Error insertStoryInput:', err);
     }

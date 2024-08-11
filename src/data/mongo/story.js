@@ -2,10 +2,14 @@ const { connectToDatabase } = require('@data/mongo.js');
 
 const collection_name = 'stories';
 
+const { insertConfig } = require('@data/mongo/config.js');
+
 async function insertStory(story) {
     try {
         const db = await connectToDatabase();
         const collection = db.collection(collection_name);
+
+        insertConfig(story.guildId, story.channelId);
 
         story.guildStoryIdentifier = await generateGuildStoryIdentifier(story.guildId);
         story.createdDate = new Date();
