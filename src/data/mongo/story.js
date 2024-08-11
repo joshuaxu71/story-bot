@@ -17,6 +17,17 @@ async function insertStory(story) {
     }
 }
 
+async function getStoryByGuildIdAndIdentifier(message) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        return await collection.findOne({guildId: message.guildId, guildStoryIdentifier: parseInt(message.content)});
+    } catch (err) {
+        console.error('Error getStoryByGuildIdAndIdentifier:', err);
+    }
+}
+
 async function archiveStory(message) {
     try {
         const db = await connectToDatabase();
@@ -92,6 +103,7 @@ async function generateGuildStoryIdentifier(guildId) {
 
 module.exports = {
     insertStory,
+    getStoryByGuildIdAndIdentifier,
     archiveStory,
     findFirstOngoingStoryByGuildId,
     updateStoryLastModifiedData
