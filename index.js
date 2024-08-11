@@ -3,7 +3,7 @@ require('module-alias/register');
 
 const { Client, GatewayIntentBits } = require('discord.js');
 
-const { insertDocument } = require('@data/mongo/storyInput.js');
+const { insertStoryInput } = require('@data/mongo/storyInput.js');
 const StoryInput = require('@model/storyInput.js');
 
 const client = new Client({ intents: [
@@ -19,7 +19,7 @@ client.on('ready', () => {
 client.on('messageCreate', (message) => {
     if (message.author.bot) return; // Ignore bot messages
     const storyInput = new StoryInput(message)
-    insertDocument(storyInput);
+    insertStoryInput(storyInput);
 });
 
 client.login(process.env.CLIENT_TOKEN);

@@ -32,5 +32,5 @@ async function insertStoryInput(storyInput) {
 }
 
 module.exports = {
-    insertDocument: insertStoryInput
+    insertStoryInput
 }
