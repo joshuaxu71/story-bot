@@ -26,6 +26,7 @@ async function archiveStory(message) {
             {guildId: message.guildId},
             {
                 $set: {
+                    title: message.content,
                     archived: true,
                 }
             },

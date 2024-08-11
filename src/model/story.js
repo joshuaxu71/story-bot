@@ -2,6 +2,7 @@ class Story {
     guildId;
     guildStoryIdentifier;
     channelId;
+    title;
     archived = false;
     createdDate;
     lastModifiedDate
