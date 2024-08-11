@@ -116,6 +116,21 @@ async function updateStoryLastModifiedData(storyInput) {
     }
 }
 
+async function updateStoryReplyId(storyId, messageId) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        collection.findOneAndUpdate(
+            { _id: storyId },
+            { $set: { replyId: messageId }},
+        );
+    } catch (err) {
+        console.error("Error updateStoryReplyId:", err);
+        return null;
+    }
+}
+
 async function generateGuildStoryIdentifier(guildId) {
     try {
         const db = await connectToDatabase();
@@ -143,5 +158,6 @@ module.exports = {
     archiveStory,
     findFirstOngoingStoryByGuildId,
     updateStoryLastModifiedData,
-    getStoriesByGuildId
+    getStoriesByGuildId,
+    updateStoryReplyId
 }

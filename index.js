@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { getStoryTitles } = require('@data/mongo/story.js');
 const { insertStoryInput } = require('@data/mongo/storyInput.js');
-const { getOngoingStory } = require('@app/story.js');
+const { getOngoingStory, setStoryReplyId } = require('@app/story.js');
 const StoryInput = require('@model/storyInput.js');
 
 const client = new Client({ intents: [
@@ -36,12 +36,13 @@ client.on('messageCreate', async (message) => {
     if (message.author.bot) return; // Ignore bot messages
     const storyInput = new StoryInput(message);
     await insertStoryInput(storyInput);
-    message.reply({
+    const reply = await message.reply({
         content: await getOngoingStory(message.guildId),
         allowedMentions: {
             repliedUser: false
         }
     });
+    setStoryReplyId(client, reply.guildId, reply.id);
 });
 
 client.on(Events.InteractionCreate, async interaction => {
