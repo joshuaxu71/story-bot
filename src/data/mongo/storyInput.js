@@ -1,17 +1,15 @@
 const { connectToDatabase } = require('@data/mongo.js');
 
-async function insertDocument() {
+const collection_name = 'story_inputs';
+
+async function insertDocument(storyInput) {
     try {
         const db = await connectToDatabase();
-        const collection = db.collection('story_inputs'); // Replace with your collection name
+        const collection = db.collection(collection_name);
 
-        const document = {
-            name: 'Jane Doe',
-            age: 25,
-            email: 'jane.doe@example.com'
-        };
-
-        const result = await collection.insertOne(document);
+        storyInput.createdDate = new Date();
+        storyInput.lastModifiedDate = new Date();
+        const result = await collection.insertOne(storyInput);
         console.log('Document inserted with _id:', result.insertedId);
     } catch (err) {
         console.error('Error inserting document:', err);
