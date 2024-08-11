@@ -17,32 +17,17 @@ async function insertStory(story) {
     }
 }
 
-async function getStoryTitles(message) {
+async function getStoriesByGuildId(guildId) {
     try {
         const db = await connectToDatabase();
         const collection = db.collection(collection_name);
 
-        const stories = await collection.find({guildId: message.guildId})
+        const stories = await collection.find({guildId: guildId})
             .sort({createdDate: 1})
             .toArray();
-
-        storyTitles = []
-        if (stories.length) {
-            for (const story of stories) {
-                if (!story.title) {
-                    story.title = "<<ongoing story>>"
-                }
-                storyTitles.push(`${story.guildStoryIdentifier}. ${story.title}`)
-            }
-        }
-
-        if (!storyTitles.length) {
-            storyTitles.push("There are no stories yet.")
-        }
-
-        return storyTitles.join("\n");
+        return stories;
     } catch (err) {
-        console.error('Error getStoryTitles:', err);
+        console.error('Error getStoriesByGuildId:', err);
     }
 }
 
@@ -136,5 +121,5 @@ module.exports = {
     archiveStory,
     findFirstOngoingStoryByGuildId,
     updateStoryLastModifiedData,
-    getStoryTitles
+    getStoriesByGuildId
 }
