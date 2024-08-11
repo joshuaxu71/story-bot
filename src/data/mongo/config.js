@@ -29,6 +29,22 @@ async function getConfigByGuildId(guildId) {
     }
 }
 
+async function setLanguageByGuildId(guildId, language) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        const languages = language === "ANY" ? [] : [language];
+        return await collection.findOneAndUpdate(
+            { guildId: guildId },
+            { $set: { languages: languages } }
+        );
+    } catch (err) {
+        console.error('Error setLanguageByGuildId:', err);
+    }
+}
+
 module.exports = {
-    insertConfig
+    insertConfig,
+    setLanguageByGuildId
 }
