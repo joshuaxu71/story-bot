@@ -1,7 +1,7 @@
 {
-  "name": "korean-gibberish-translator",
+  "name": "story-bot",
   "version": "1.0.0",
-  "description": "A discord bot that will translate any Korean/English gibberish caused by not switching languages.",
+  "description": "A discord bot that will compile user inputs into a story.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
