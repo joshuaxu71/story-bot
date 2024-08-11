@@ -4,6 +4,7 @@ const Story = require('@model/story.js');
 const StoryInput = require('@model/storyInput.js');
 
 const { insertStory, findFirstOngoingStoryByGuildId, updateStoryLastModifiedData } = require('@data/mongo/story.js');
+const { isInputValid } = require('@data/mongo/config.js');
 
 const collection_name = 'story_inputs';
 
@@ -11,6 +12,11 @@ async function insertStoryInput(message) {
     try {
         const db = await connectToDatabase();
         const collection = db.collection(collection_name);
+
+        const isValid = await isInputValid(message);
+        if (!isValid) {
+            return "Input is invalid. Please check the supported language."
+        }
 
         const storyInput = new StoryInput(message);
         const story = await findFirstOngoingStoryByGuildId(storyInput.guildId)

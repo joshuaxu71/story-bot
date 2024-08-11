@@ -34,14 +34,23 @@ client.on('ready', () => {
 
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return; // Ignore bot messages
-    await insertStoryInput(message);
-    const reply = await message.reply({
-        content: await getOngoingStory(message.guildId),
-        allowedMentions: {
-            repliedUser: false
-        }
-    });
-    setStoryReplyId(client, reply.guildId, reply.id);
+    const result = await insertStoryInput(message);
+    if (result) {
+        const reply = await message.reply({
+            content: result,
+            allowedMentions: {
+                repliedUser: false
+            }
+        });
+    } else {
+        const reply = await message.reply({
+            content: await getOngoingStory(message.guildId),
+            allowedMentions: {
+                repliedUser: false
+            }
+        });
+        setStoryReplyId(client, reply.guildId, reply.id);
+    }
 });
 
 client.on(Events.InteractionCreate, async interaction => {

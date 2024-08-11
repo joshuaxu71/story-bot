@@ -44,7 +44,37 @@ async function setLanguageByGuildId(guildId, language) {
     }
 }
 
+function containsKorean(str) {
+    const koreanRegex = /[가-힣]/;
+    return koreanRegex.test(str);
+}
+
+function containsEnglish(str) {
+    const englishRegex = /[a-zA-Z]/;
+    return englishRegex.test(str);
+}
+
+async function isInputValid(message) {
+    try {
+        const config = await getConfigByGuildId(message.guildId);
+        if (!config || !config.languages.length) {
+            return true;
+        }
+
+        const allowedLanguages = config.languages[0];
+        if (allowedLanguages === "EN" && containsKorean(message.content)) {
+            return false;
+        } else if (allowedLanguages === "KR" && containsEnglish(message.content)) {
+            return false;
+        }
+        return true;
+    } catch (err) {
+        console.error('Error isInputValid:', err);
+    }
+}
+
 module.exports = {
     insertConfig,
-    setLanguageByGuildId
+    setLanguageByGuildId,
+    isInputValid
 }
