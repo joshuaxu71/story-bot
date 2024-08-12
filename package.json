@@ -20,5 +20,8 @@
     "@commands": "src/commands",
     "@data": "src/data",
     "@model": "src/model"
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "^0.5.8"
   }
 }
