@@ -44,6 +44,20 @@ async function setLanguageByGuildId(guildId, language) {
     }
 }
 
+async function setPrefixByGuildId(guildId, prefix) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        return await collection.findOneAndUpdate(
+            { guildId: guildId },
+            { $set: { prefix: prefix + " " } } // Add space so that there's a space between prefix and input
+        );
+    } catch (err) {
+        console.error('Error setPrefixByGuildId:', err);
+    }
+}
+
 async function deleteConfigsByGuildId(guildId) {
     try {
         const db = await connectToDatabase();
@@ -88,5 +102,7 @@ module.exports = {
     insertConfig,
     setLanguageByGuildId,
     isInputValid,
-    deleteConfigsByGuildId
+    deleteConfigsByGuildId,
+    setPrefixByGuildId,
+    getConfigByGuildId
 }

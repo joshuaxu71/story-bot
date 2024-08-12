@@ -1,5 +1,6 @@
 const { getStoryByGuildIdAndIdentifier, getOngoingStoryByGuildId, updateStoryReplyId } = require('@data/mongo/story.js');
 const { getStoryInputsByStoryId } = require('@data/mongo/storyInput.js');
+const { getConfigByGuildId } = require('@data/mongo/config.js');
 
 async function getOngoingStory(guildId) {
     try {

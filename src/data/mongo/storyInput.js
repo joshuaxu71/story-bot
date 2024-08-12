@@ -4,7 +4,7 @@ const Story = require('@model/story.js');
 const StoryInput = require('@model/storyInput.js');
 
 const { insertStory, findFirstOngoingStoryByGuildId, updateStoryLastModifiedData } = require('@data/mongo/story.js');
-const { isInputValid } = require('@data/mongo/config.js');
+const { isInputValid, getConfigByGuildId } = require('@data/mongo/config.js');
 
 const collection_name = 'story_inputs';
 
@@ -12,6 +12,16 @@ async function insertStoryInput(message) {
     try {
         const db = await connectToDatabase();
         const collection = db.collection(collection_name);
+
+        const config = await getConfigByGuildId(message.guildId);
+        if (config) {
+            const hasPrefix = message.content.startsWith(config.prefix);
+            if (hasPrefix) {
+                message.content = message.content.slice(config.prefix.length)
+            } else {
+                return "Not using prefix, not story input";
+            }
+        }
 
         const isValid = await isInputValid(message);
         if (!isValid) {

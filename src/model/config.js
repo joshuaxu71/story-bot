@@ -1,6 +1,7 @@
 class Config {
     guildId;
     channelId;
+    prefix = '! ';
     languages = [];
     endingText;
     minStoryInputLength;

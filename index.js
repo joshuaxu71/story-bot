@@ -34,8 +34,13 @@ client.on('ready', () => {
 
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return; // Ignore bot messages
+
     const result = await insertStoryInput(message);
     if (result) {
+        if (result === "Not using prefix, not story input") {
+            return;
+        }
+        
         const reply = await message.reply({
             content: result,
             allowedMentions: {
