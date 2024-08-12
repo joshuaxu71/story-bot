@@ -155,6 +155,17 @@ async function generateGuildStoryIdentifier(guildId) {
     }
 }
 
+async function deleteStoriesByGuildId(guildId) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        return await collection.deleteMany({ guildId: guildId })
+    } catch (err) {
+        console.error('Error deleteStoriesByGuildId:', err);
+    }
+}
+
 module.exports = {
     insertStory,
     getStoryByGuildIdAndIdentifier,
@@ -163,5 +174,6 @@ module.exports = {
     findFirstOngoingStoryByGuildId,
     updateStoryLastModifiedData,
     getStoriesByGuildId,
-    updateStoryReplyId
+    updateStoryReplyId,
+    deleteStoriesByGuildId
 }

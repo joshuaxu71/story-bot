@@ -52,7 +52,19 @@ async function getStoryInputsByStoryId(storyId) {
     }
 }
 
+async function deleteStoryInputsByGuildId(guildId) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        return await collection.deleteMany({ guildId: guildId })
+    } catch (err) {
+        console.error('Error deleteStoryInputsByGuildId:', err);
+    }
+}
+
 module.exports = {
     insertStoryInput,
-    getStoryInputsByStoryId
+    getStoryInputsByStoryId,
+    deleteStoryInputsByGuildId
 }

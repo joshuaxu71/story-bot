@@ -44,6 +44,17 @@ async function setLanguageByGuildId(guildId, language) {
     }
 }
 
+async function deleteConfigsByGuildId(guildId) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        return await collection.deleteMany({ guildId: guildId })
+    } catch (err) {
+        console.error('Error deleteConfigsByGuildId:', err);
+    }
+}
+
 function containsKorean(str) {
     const koreanRegex = /[가-힣]/;
     return koreanRegex.test(str);
@@ -76,5 +87,6 @@ async function isInputValid(message) {
 module.exports = {
     insertConfig,
     setLanguageByGuildId,
-    isInputValid
+    isInputValid,
+    deleteConfigsByGuildId
 }
