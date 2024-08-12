@@ -2,10 +2,14 @@ const { connectToDatabase } = require('@data/mongo.js');
 
 const collection_name = 'stories';
 
+const { insertConfig } = require('@data/mongo/config.js');
+
 async function insertStory(story) {
     try {
         const db = await connectToDatabase();
         const collection = db.collection(collection_name);
+
+        insertConfig(story.guildId, story.channelId);
 
         story.guildStoryIdentifier = await generateGuildStoryIdentifier(story.guildId);
         story.createdDate = new Date();
@@ -151,6 +155,17 @@ async function generateGuildStoryIdentifier(guildId) {
     }
 }
 
+async function deleteStoriesByGuildId(guildId) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        return await collection.deleteMany({ guildId: guildId })
+    } catch (err) {
+        console.error('Error deleteStoriesByGuildId:', err);
+    }
+}
+
 module.exports = {
     insertStory,
     getStoryByGuildIdAndIdentifier,
@@ -159,5 +174,6 @@ module.exports = {
     findFirstOngoingStoryByGuildId,
     updateStoryLastModifiedData,
     getStoriesByGuildId,
-    updateStoryReplyId
+    updateStoryReplyId,
+    deleteStoriesByGuildId
 }

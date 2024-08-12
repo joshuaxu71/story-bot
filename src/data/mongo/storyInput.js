@@ -1,16 +1,24 @@
 const { connectToDatabase } = require('@data/mongo.js');
 
 const Story = require('@model/story.js');
+const StoryInput = require('@model/storyInput.js');
 
 const { insertStory, findFirstOngoingStoryByGuildId, updateStoryLastModifiedData } = require('@data/mongo/story.js');
+const { isInputValid } = require('@data/mongo/config.js');
 
 const collection_name = 'story_inputs';
 
-async function insertStoryInput(storyInput) {
+async function insertStoryInput(message) {
     try {
         const db = await connectToDatabase();
         const collection = db.collection(collection_name);
 
+        const isValid = await isInputValid(message);
+        if (!isValid) {
+            return "Input is invalid. Please check the supported language."
+        }
+
+        const storyInput = new StoryInput(message);
         const story = await findFirstOngoingStoryByGuildId(storyInput.guildId)
         if (story) {
             storyInput.storyId = story._id
@@ -25,7 +33,7 @@ async function insertStoryInput(storyInput) {
 
         storyInput.createdDate = new Date();
         await collection.insertOne(storyInput);    
-        await updateStoryLastModifiedData(storyInput);    
+        await updateStoryLastModifiedData(storyInput);
     } catch (err) {
         console.error('Error insertStoryInput:', err);
     }
@@ -44,7 +52,19 @@ async function getStoryInputsByStoryId(storyId) {
     }
 }
 
+async function deleteStoryInputsByGuildId(guildId) {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection(collection_name);
+
+        return await collection.deleteMany({ guildId: guildId })
+    } catch (err) {
+        console.error('Error deleteStoryInputsByGuildId:', err);
+    }
+}
+
 module.exports = {
     insertStoryInput,
-    getStoryInputsByStoryId
+    getStoryInputsByStoryId,
+    deleteStoryInputsByGuildId
 }
