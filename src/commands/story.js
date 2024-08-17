@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 
-const { getStoryContentByIdentifier } = require('@app/story.js');
+const { getStoryContentByIdentifier } = require('@service/story.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()

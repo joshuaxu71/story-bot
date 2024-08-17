@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { getStoryTitles } = require('@data/mongo/story.js');
 const { insertStoryInput } = require('@data/mongo/storyInput.js');
-const { getOngoingStory, setStoryReplyId } = require('@app/story.js');
+const { getOngoingStory, setStoryReplyId } = require('@service/story.js');
 const StoryInput = require('@model/storyInput.js');
 
 const client = new Client({ intents: [
