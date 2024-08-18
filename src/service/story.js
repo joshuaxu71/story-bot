@@ -1,76 +1,127 @@
-const { getStoryByGuildIdAndIdentifier, getOngoingStoryByGuildId, updateStoryReplyId } = require('@data/mongo/story.js');
-const { getStoryInputsByStoryId } = require('@data/mongo/storyInput.js');
-const { getConfigByGuildId } = require('@data/mongo/config.js');
+const StoryRepository = require("@data/mongo/story.js");
 
-async function getOngoingStory(guildId) {
-    try {
-        const story = await getOngoingStoryByGuildId(guildId);
-        var storyContent = "";
-        if (story) {
-            const storyInputs = await getStoryInputsByStoryId(story._id);
-            if (storyInputs.length) {
-                for (const storyInput of storyInputs) {
-                    storyContent += " " + storyInput.message;
-                }
+class StoryService {
+   async insertStory(story) {
+      const storyRepository = await StoryRepository.getInstance();
+      // insertConfig(story.guildId, story.channelId);
+
+      story.guildStoryIdentifier = await this.#generateGuildStoryIdentifier(
+         story.guildId
+      );
+      story.createdDate = new Date();
+      story.lastModifiedDate = new Date();
+      const result = await storyRepository.insertStory(story);
+      return result.insertedId;
+   }
+
+   async archiveStory(guildId, title) {
+      const storyRepository = await StoryRepository.getInstance();
+      const update = {
+         $set: {
+            title: title,
+            archived: true,
+         },
+      };
+
+      const latestStory = await storyRepository.getOngoingStoryByGuildId(
+         guildId
+      );
+
+      if (latestStory) {
+         await storyRepository.updateStoryById(latestStory._id, update);
+         return `The ongoing story has been archived with the title \`${title}\``;
+      } else {
+         return `There is no ongoing story to archive.`;
+      }
+   }
+
+   async updateStoryLastModifiedData(storyInput) {
+      const storyRepository = await StoryRepository.getInstance();
+      const update = {
+         $set: {
+            lastModifiedDate: new Date(),
+            lastModifiedBy: storyInput.userId,
+         },
+      };
+
+      return await storyRepository.updateStoryById(latestStory._id, update);
+   }
+
+   async getOngoingStoryContent(guildId) {
+      const storyRepository = await StoryRepository.getInstance();
+      const story = storyRepository.getOngoingStoryByGuildId(guildId);
+      return this.#generateStoryContent(story);
+   }
+
+   async getStoryContentByIdentifier(guildId, guildStoryIdentifier) {
+      const storyRepository = await StoryRepository.getInstance();
+      const story = storyRepository.getStoryByGuildIdAndIdentifier(
+         guildId,
+         guildStoryIdentifier
+      );
+
+      return this.#generateStoryContent(story);
+   }
+
+   async setStoryReplyId(client, guildId, messageId) {
+      const storyRepository = await StoryRepository.getInstance();
+      const story = storyRepository.getOngoingStoryByGuildId(guildId);
+      if (story) {
+         this.#removePreviousStoryReply(client, story.channelId, story.replyId);
+         this.#updateStoryReplyId(story._id, messageId);
+      } else {
+         console.warn(
+            `Warn setStoryReplyId ongoing story for guild ${guildId} does not exist.`
+         );
+      }
+   }
+
+   async #generateGuildStoryIdentifier(guildId) {
+      const storyRepository = await StoryRepository.getInstance();
+      const latestStory = storyRepository.getLatestStoryByGuildId(guildId);
+
+      if (latestStory) {
+         return latestStory.guildStoryIdentifier + 1;
+      }
+      return 1;
+   }
+
+   async #generateStoryContent(story) {
+      var storyContent = "";
+      if (story) {
+         // const storyInputs = await getStoryInputsByStoryId(story._id);
+         if (storyInputs.length) {
+            for (const storyInput of storyInputs) {
+               storyContent += " " + storyInput.message;
             }
-        }
+         }
+      }
 
-        if (storyContent === "") {
-            storyContent = "There is no story with this ID.";
-        }
-        return storyContent;
-    } catch (err) {
-        console.error('Error getOngoingStory:', err);
-    }
-}
+      if (storyContent === "") {
+         storyContent = "There is no story with this ID.";
+      }
 
-async function setStoryReplyId(client, guildId, messageId) {
-    const story = await getOngoingStoryByGuildId(guildId);
-    if (story) {
-        removePreviousStoryReply(client, story.channelId, story.replyId);
-        updateStoryReplyId(story._id, messageId);
-    } else {
-        console.warn(`Warn setStoryReplyId ongoing story for guild ${guildId} does not exist.`);
-    }
-}
+      return storyContent;
+   }
 
-async function removePreviousStoryReply(client, channelId, replyId) {
-    try {
-        const channel = await client.channels.fetch(channelId);
-        const message = await channel.messages.fetch(replyId);
+   async #updateStoryReplyId(storyId, messageId) {
+      const storyRepository = await StoryRepository.getInstance();
+      const update = { $set: { replyId: messageId } };
+      return await storyRepository.updateStoryById(storyId, update);
+   }
 
-        if (message) {
+   async #removePreviousStoryReply(client, channelId, replyId) {
+      try {
+         const channel = await client.channels.fetch(channelId);
+         const message = await channel.messages.fetch(replyId);
+
+         if (message) {
             await message.delete();
-        }
-    } catch (err) {
-        console.error('Error removePreviousStoryReply:', err);
-    }
+         }
+      } catch (err) {
+         console.error("Error removePreviousStoryReply:", err);
+      }
+   }
 }
 
-async function getStoryContentByIdentifier(guildId, guildStoryIdentifier) {
-    try {
-        const story = await getStoryByGuildIdAndIdentifier(guildId, guildStoryIdentifier);
-        var storyContent = "";
-        if (story) {
-            const storyInputs = await getStoryInputsByStoryId(story._id);
-            if (storyInputs.length) {
-                for (const storyInput of storyInputs) {
-                    storyContent += " " + storyInput.message;
-                }
-            }
-        }
-
-        if (storyContent === "") {
-            storyContent = "There is no story with this ID.";
-        }
-        return storyContent;
-    } catch (err) {
-        console.error('Error getStoryContentByIdentifier:', err);
-    }
-}
-
-module.exports = {
-    getStoryContentByIdentifier,
-    getOngoingStory,
-    setStoryReplyId
-}
+module.exports = ConfigService;
