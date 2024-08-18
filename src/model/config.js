@@ -1,7 +1,7 @@
 class Config {
    guildId;
    channelId;
-   prefix = "! ";
+   prefix = ":writing_hand: ";
    languages = [];
    endingText;
    minStoryInputLength;
