@@ -1,108 +1,99 @@
-const { connectToDatabase } = require('@data/mongo.js');
+const {
+   getDatabaseCollection,
+   executeWithCatch,
+} = require("@data/mongo/dbHelper.js");
+const Config = require("@model/config.js");
 
-const Config = require('@model/config.js');
+class ConfigService {
+   constructor() {
+      this.collectionName = "configs";
+   }
 
-const collection_name = 'configs';
+   async initialize() {
+      this.collection = await getDatabaseCollection(this.collectionName);
+   }
 
-async function insertConfig(guildId, channelId) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
+   async insertConfig(guildId, channelId) {
+      return executeWithCatch("insertConfig", async () => {
+         const config = await this.getConfigByGuildId(guildId);
+         if (!config) {
+            await this.collection.insertOne(new Config(guildId, channelId));
+         }
+      });
+   }
 
-        const config = await getConfigByGuildId(guildId);
-        if (!config) {
-            await collection.insertOne(new Config(guildId, channelId));    
-        }
-    } catch (err) {
-        console.error('Error insertConfig:', err);
-    }
-}
+   async updateConfigByGuildId(guildId, update) {
+      return executeWithCatch("updateConfigByGuildId", async () => {
+         return await this.collection.findOneAndUpdate(
+            { guildId: guildId },
+            update
+         );
+      });
+   }
 
-async function getConfigByGuildId(guildId) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
+   async deleteConfigsByGuildId(guildId) {
+      return executeWithCatch("deleteConfigsByGuildId", async () => {
+         return await this.collection.deleteMany({ guildId: guildId });
+      });
+   }
 
-        return await collection.findOne({ guildId: guildId });
-    } catch (err) {
-        console.error('Error insertConfig:', err);
-    }
-}
+   async getConfigByGuildId(guildId) {
+      return executeWithCatch("getConfigByGuildId", async () => {
+         return await this.collection.findOne({ guildId: guildId });
+      });
+   }
 
-async function setLanguageByGuildId(guildId, language) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
-
-        const languages = language === "ANY" ? [] : [language];
-        return await collection.findOneAndUpdate(
+   async setLanguageByGuildId(guildId, language) {
+      return executeWithCatch("setLanguageByGuildId", async () => {
+         const languages = language === "ANY" ? [] : [language];
+         return await this.collection.findOneAndUpdate(
             { guildId: guildId },
             { $set: { languages: languages } }
-        );
-    } catch (err) {
-        console.error('Error setLanguageByGuildId:', err);
-    }
-}
+         );
+      });
+   }
 
-async function setPrefixByGuildId(guildId, prefix) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
-
-        return await collection.findOneAndUpdate(
+   async setPrefixByGuildId(guildId, prefix) {
+      return executeWithCatch("setPrefixByGuildId", async () => {
+         return await this.collection.findOneAndUpdate(
             { guildId: guildId },
             { $set: { prefix: prefix + " " } } // Add space so that there's a space between prefix and input
-        );
-    } catch (err) {
-        console.error('Error setPrefixByGuildId:', err);
-    }
-}
+         );
+      });
+   }
 
-async function deleteConfigsByGuildId(guildId) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
-
-        return await collection.deleteMany({ guildId: guildId })
-    } catch (err) {
-        console.error('Error deleteConfigsByGuildId:', err);
-    }
-}
-
-function containsKorean(str) {
-    const koreanRegex = /[가-힣]/;
-    return koreanRegex.test(str);
-}
-
-function containsEnglish(str) {
-    const englishRegex = /[a-zA-Z]/;
-    return englishRegex.test(str);
-}
-
-async function isInputValid(message) {
-    try {
-        const config = await getConfigByGuildId(message.guildId);
-        if (!config || !config.languages.length) {
+   async isInputValid(message) {
+      return executeWithCatch("isInputValid", async () => {
+         const config = await this.getConfigByGuildId(message.guildId);
+         if (!config || !config.languages.length) {
             return true;
-        }
+         }
 
-        const allowedLanguages = config.languages[0];
-        if (allowedLanguages === "EN" && containsKorean(message.content)) {
+         const allowedLanguages = config.languages[0];
+         if (
+            allowedLanguages === "EN" &&
+            this.containsKorean(message.content)
+         ) {
             return false;
-        } else if (allowedLanguages === "KR" && containsEnglish(message.content)) {
+         } else if (
+            allowedLanguages === "KR" &&
+            this.containsEnglish(message.content)
+         ) {
             return false;
-        }
-        return true;
-    } catch (err) {
-        console.error('Error isInputValid:', err);
-    }
+         }
+         return true;
+      });
+   }
+
+   containsKorean(str) {
+      const koreanRegex = /[가-힣]/;
+      return koreanRegex.test(str);
+   }
+
+   containsEnglish(str) {
+      const englishRegex = /[a-zA-Z]/;
+      return englishRegex.test(str);
+   }
 }
 
-module.exports = {
-    insertConfig,
-    setLanguageByGuildId,
-    isInputValid,
-    deleteConfigsByGuildId,
-    setPrefixByGuildId,
-    getConfigByGuildId
-}
+module.exports = ConfigService;

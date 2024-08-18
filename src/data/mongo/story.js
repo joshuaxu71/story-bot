@@ -1,179 +1,140 @@
-const { connectToDatabase } = require('@data/mongo.js');
+const {
+   executeWithCatch,
+   getDatabaseCollection,
+} = require("@data/mongo/dbHelper.js");
+const { insertConfig } = require("@data/mongo/config.js");
 
-const collection_name = 'stories';
+class StoryService {
+   constructor() {
+      this.collectionName = "stories";
+   }
 
-const { insertConfig } = require('@data/mongo/config.js');
+   async initialize() {
+      this.collection = await getDatabaseCollection(this.collectionName);
+   }
 
-async function insertStory(story) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
+   async insertStory(story) {
+      return executeWithCatch("insertStory", async () => {
+         insertConfig(story.guildId, story.channelId);
 
-        insertConfig(story.guildId, story.channelId);
+         story.guildStoryIdentifier = await generateGuildStoryIdentifier(
+            story.guildId
+         );
+         story.createdDate = new Date();
+         story.lastModifiedDate = new Date();
+         const result = await this.collection.insertOne(story);
+         return result.insertedId;
+      });
+   }
 
-        story.guildStoryIdentifier = await generateGuildStoryIdentifier(story.guildId);
-        story.createdDate = new Date();
-        story.lastModifiedDate = new Date();
-        const result = await collection.insertOne(story);
-        return result.insertedId;
-    } catch (err) {
-        console.error('Error insertStory:', err);
-    }
-}
-
-async function getStoriesByGuildId(guildId) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
-
-        const stories = await collection.find({guildId: guildId})
-            .sort({createdDate: 1})
+   async getStoriesByGuildId(guildId) {
+      return executeWithCatch("getStoriesByGuildId", async () => {
+         const stories = await this.collection
+            .find({ guildId: guildId })
+            .sort({ createdDate: 1 })
             .toArray();
-        return stories;
-    } catch (err) {
-        console.error('Error getStoriesByGuildId:', err);
-    }
-}
+         return stories;
+      });
+   }
 
-async function getOngoingStoryByGuildId(guildId) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
+   async getOngoingStoryByGuildId(guildId) {
+      return executeWithCatch("getOngoingStoryByGuildId", async () => {
+         return await this.collection.findOne({
+            guildId: guildId,
+            archived: false,
+         });
+      });
+   }
 
-        return await collection.findOne({ guildId: guildId, archived: false });
-    } catch (err) {
-        console.error('Error getOngoingStoryByGuildId:', err);
-    }
-}
+   async getStoryByGuildIdAndIdentifier(guildId, guildStoryIdentifier) {
+      return executeWithCatch("getStoryByGuildIdAndIdentifier", async () => {
+         return await this.collection.findOne({
+            guildId: guildId,
+            guildStoryIdentifier: guildStoryIdentifier,
+         });
+      });
+   }
 
-async function getStoryByGuildIdAndIdentifier(guildId, guildStoryIdentifier) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
-
-        return await collection.findOne({guildId: guildId, guildStoryIdentifier: guildStoryIdentifier});
-    } catch (err) {
-        console.error('Error getStoryByGuildIdAndIdentifier:', err);
-    }
-}
-
-async function archiveStory(guildId, title) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
-
-        const latestStory = await collection.find({ guildId: guildId, archived: false })
+   async archiveStory(guildId, title) {
+      return executeWithCatch("archiveStory", async () => {
+         const latestStory = await this.collection
+            .find({ guildId: guildId, archived: false })
             .sort({ createdDate: -1 })
             .limit(1)
             .toArray();
 
-        if (latestStory.length) {
-            await collection.findOneAndUpdate(
-                { _id: latestStory[0]._id },
-                {
-                    $set: {
-                        title: title,
-                        archived: true,
-                    }
-                },
+         if (latestStory.length) {
+            await this.collection.findOneAndUpdate(
+               { _id: latestStory[0]._id },
+               {
+                  $set: {
+                     title: title,
+                     archived: true,
+                  },
+               }
             );
             return `The ongoing story has been archived with the title \`${title}\``;
-        } else {
+         } else {
             return `There is no ongoing story to archive.`;
-        }        
-    } catch (err) {
-        console.error('Error archiveStory:', err);
-    }
-}
+         }
+      });
+   }
 
-async function findFirstOngoingStoryByGuildId(guildId) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
+   async findFirstOngoingStoryByGuildId(guildId) {
+      return executeWithCatch("findFirstOngoingStoryByGuildId", async () => {
+         const document = await this.collection.findOne({
+            guildId: guildId,
+            archived: false,
+         });
+         return document;
+      });
+   }
 
-        const document = await collection.findOne({guildId: guildId, archived: false});
-        return document;
-    } catch (err) {
-        console.error('Error findFirstStoryByGuildId:', err);
-        return null;
-    }
-}
-
-async function updateStoryLastModifiedData(storyInput) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
-
-        const document = await collection.findOneAndUpdate(
-            {_id: storyInput.storyId},
+   async updateStoryLastModifiedData(storyInput) {
+      return executeWithCatch("updateStoryLastModifiedData", async () => {
+         const document = await this.collection.findOneAndUpdate(
+            { _id: storyInput.storyId },
             {
-                $set: {
-                    lastModifiedDate: new Date(),
-                    lastModifiedBy: storyInput.userId
-                }
-            },
-        );
-        return document;
-    } catch (err) {
-        console.error("Error updateStoryLastModifiedData:", err);
-        return null;
-    }
-}
+               $set: {
+                  lastModifiedDate: new Date(),
+                  lastModifiedBy: storyInput.userId,
+               },
+            }
+         );
+         return document;
+      });
+   }
 
-async function updateStoryReplyId(storyId, messageId) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
-
-        collection.findOneAndUpdate(
+   async updateStoryReplyId(storyId, messageId) {
+      return executeWithCatch("updateStoryReplyId", async () => {
+         return await this.collection.findOneAndUpdate(
             { _id: storyId },
-            { $set: { replyId: messageId }},
-        );
-    } catch (err) {
-        console.error("Error updateStoryReplyId:", err);
-        return null;
-    }
-}
+            { $set: { replyId: messageId } }
+         );
+      });
+   }
 
-async function generateGuildStoryIdentifier(guildId) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
-
-        const latestStory = await collection.find({guildId: guildId})
-            .sort({createdDate: -1})
+   async generateGuildStoryIdentifier(guildId) {
+      return executeWithCatch("generateGuildStoryIdentifier", async () => {
+         const latestStory = await this.collection
+            .find({ guildId: guildId })
+            .sort({ createdDate: -1 })
             .limit(1)
             .toArray();
-        var guildStoryIdentifier = 1
-        if (latestStory.length) {
-            guildStoryIdentifier = latestStory[0].guildStoryIdentifier + 1
-        }
-        
-        return guildStoryIdentifier;
-    } catch (err) {
-        console.error('Error insertStory:', err);
-    }
+         var guildStoryIdentifier = 1;
+         if (latestStory.length) {
+            guildStoryIdentifier = latestStory[0].guildStoryIdentifier + 1;
+         }
+
+         return guildStoryIdentifier;
+      });
+   }
+
+   async deleteStoriesByGuildId(guildId) {
+      return executeWithCatch("deleteStoriesByGuildId", async () => {
+         return await this.collection.deleteMany({ guildId: guildId });
+      });
+   }
 }
 
-async function deleteStoriesByGuildId(guildId) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
-
-        return await collection.deleteMany({ guildId: guildId })
-    } catch (err) {
-        console.error('Error deleteStoriesByGuildId:', err);
-    }
-}
-
-module.exports = {
-    insertStory,
-    getStoryByGuildIdAndIdentifier,
-    getOngoingStoryByGuildId,
-    archiveStory,
-    findFirstOngoingStoryByGuildId,
-    updateStoryLastModifiedData,
-    getStoriesByGuildId,
-    updateStoryReplyId,
-    deleteStoriesByGuildId
-}
+module.exports = StoryService;

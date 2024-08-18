@@ -1,80 +1,77 @@
-const { connectToDatabase } = require('@data/mongo.js');
+const {
+   executeWithCatch,
+   getDatabaseCollection,
+} = require("@data/mongo/dbHelper.js");
 
-const Story = require('@model/story.js');
-const StoryInput = require('@model/storyInput.js');
+const Story = require("@model/story.js");
+const StoryInput = require("@model/storyInput.js");
 
-const { insertStory, findFirstOngoingStoryByGuildId, updateStoryLastModifiedData } = require('@data/mongo/story.js');
-const { isInputValid, getConfigByGuildId } = require('@data/mongo/config.js');
+const {
+   insertStory,
+   findFirstOngoingStoryByGuildId,
+   updateStoryLastModifiedData,
+} = require("@data/mongo/story.js");
+const { isInputValid, getConfigByGuildId } = require("@data/mongo/config.js");
 
-const collection_name = 'story_inputs';
+class StoryInputService {
+   constructor() {
+      this.collectionName = "story_inputs";
+   }
 
-async function insertStoryInput(message) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
+   async initialize() {
+      this.collection = await getDatabaseCollection(this.collectionName);
+   }
 
-        const config = await getConfigByGuildId(message.guildId);
-        if (config) {
+   async insertStoryInput(message) {
+      return executeWithCatch("insertStoryInput", async () => {
+         const config = await getConfigByGuildId(message.guildId);
+         if (config) {
             const hasPrefix = message.content.startsWith(config.prefix);
             if (hasPrefix) {
-                message.content = message.content.slice(config.prefix.length)
+               message.content = message.content.slice(config.prefix.length);
             } else {
-                return "Not using prefix, not story input";
+               return "Not using prefix, not story input";
             }
-        }
+         }
 
-        const isValid = await isInputValid(message);
-        if (!isValid) {
-            return "Input is invalid. Please check the supported language."
-        }
+         const isValid = await isInputValid(message);
+         if (!isValid) {
+            return "Input is invalid. Please check the supported language.";
+         }
 
-        const storyInput = new StoryInput(message);
-        const story = await findFirstOngoingStoryByGuildId(storyInput.guildId)
-        if (story) {
-            storyInput.storyId = story._id
-        } else {
-            const storyId = await insertStory(new Story(storyInput))
+         const storyInput = new StoryInput(message);
+         const story = await findFirstOngoingStoryByGuildId(storyInput.guildId);
+         if (story) {
+            storyInput.storyId = story._id;
+         } else {
+            const storyId = await insertStory(new Story(storyInput));
             if (storyId) {
-                storyInput.storyId = storyId
+               storyInput.storyId = storyId;
             } else {
-                throw new Error('New story was not successfully created.');
+               throw new Error("New story was not successfully created.");
             }
-        }
+         }
 
-        storyInput.createdDate = new Date();
-        await collection.insertOne(storyInput);    
-        await updateStoryLastModifiedData(storyInput);
-    } catch (err) {
-        console.error('Error insertStoryInput:', err);
-    }
-}
+         storyInput.createdDate = new Date();
+         await this.collection.insertOne(storyInput);
+         await updateStoryLastModifiedData(storyInput);
+      });
+   }
 
-async function getStoryInputsByStoryId(storyId) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
-
-        return await collection.find({storyId: storyId})
-            .sort({createdDate: 1})
+   async getStoryInputsByStoryId(storyId) {
+      return executeWithCatch("getStoryInputsByStoryId", async () => {
+         return await this.collection
+            .find({ storyId: storyId })
+            .sort({ createdDate: 1 })
             .toArray();
-    } catch (err) {
-        console.error('Error getStoryContentByStoryId:', err);
-    }
+      });
+   }
+
+   async deleteStoryInputsByGuildId(guildId) {
+      return executeWithCatch("deleteStoryInputsByGuildId", async () => {
+         return await this.collection.deleteMany({ guildId: guildId });
+      });
+   }
 }
 
-async function deleteStoryInputsByGuildId(guildId) {
-    try {
-        const db = await connectToDatabase();
-        const collection = db.collection(collection_name);
-
-        return await collection.deleteMany({ guildId: guildId })
-    } catch (err) {
-        console.error('Error deleteStoryInputsByGuildId:', err);
-    }
-}
-
-module.exports = {
-    insertStoryInput,
-    getStoryInputsByStoryId,
-    deleteStoryInputsByGuildId
-}
+module.exports = StoryInputService;
