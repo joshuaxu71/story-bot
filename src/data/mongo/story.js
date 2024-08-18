@@ -4,21 +4,21 @@ const {
 } = require("@data/mongo/dbHelper.js");
 const { insertConfig } = require("@data/mongo/config.js");
 
-class StoryService {
+class StoryRepository {
    constructor() {
-      if (StoryService.instance) {
-         return StoryService.instance;
+      if (StoryRepository.instance) {
+         return StoryRepository.instance;
       }
       this.collectionName = "stories";
-      StoryService.instance = this;
+      StoryRepository.instance = this;
    }
 
    static async getInstance() {
-      if (!StoryService.instance) {
-         StoryService.instance = new StoryService();
-         await StoryService.instance.initialize();
+      if (!StoryRepository.instance) {
+         StoryRepository.instance = new StoryRepository();
+         await StoryRepository.instance.initialize();
       }
-      return StoryService.instance;
+      return StoryRepository.instance;
    }
 
    async initialize() {
@@ -149,4 +149,4 @@ class StoryService {
    }
 }
 
-module.exports = StoryService;
+module.exports = StoryRepository;

@@ -13,21 +13,21 @@ const {
 } = require("@data/mongo/story.js");
 const { isInputValid, getConfigByGuildId } = require("@data/mongo/config.js");
 
-class StoryInputService {
+class StoryInputRepository {
    constructor() {
-      if (StoryInputService.instance) {
-         return StoryInputService.instance;
+      if (StoryInputRepository.instance) {
+         return StoryInputRepository.instance;
       }
       this.collectionName = "story_inputs";
-      StoryInputService.instance = this;
+      StoryInputRepository.instance = this;
    }
 
    static async getInstance() {
-      if (!StoryInputService.instance) {
-         StoryInputService.instance = new StoryInputService();
-         await StoryInputService.instance.initialize();
+      if (!StoryInputRepository.instance) {
+         StoryInputRepository.instance = new StoryInputRepository();
+         await StoryInputRepository.instance.initialize();
       }
-      return StoryInputService.instance;
+      return StoryInputRepository.instance;
    }
 
    async initialize() {
@@ -86,4 +86,4 @@ class StoryInputService {
    }
 }
 
-module.exports = StoryInputService;
+module.exports = StoryInputRepository;
