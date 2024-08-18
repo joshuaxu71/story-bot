@@ -6,7 +6,19 @@ const Config = require("@model/config.js");
 
 class ConfigService {
    constructor() {
+      if (ConfigService.instance) {
+         return ConfigService.instance;
+      }
       this.collectionName = "configs";
+      ConfigService.instance = this;
+   }
+
+   static async getInstance() {
+      if (!ConfigService.instance) {
+         ConfigService.instance = new ConfigService();
+         await ConfigService.instance.initialize();
+      }
+      return ConfigService.instance;
    }
 
    async initialize() {

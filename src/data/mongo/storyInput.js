@@ -15,7 +15,19 @@ const { isInputValid, getConfigByGuildId } = require("@data/mongo/config.js");
 
 class StoryInputService {
    constructor() {
+      if (StoryInputService.instance) {
+         return StoryInputService.instance;
+      }
       this.collectionName = "story_inputs";
+      StoryInputService.instance = this;
+   }
+
+   static async getInstance() {
+      if (!StoryInputService.instance) {
+         StoryInputService.instance = new StoryInputService();
+         await StoryInputService.instance.initialize();
+      }
+      return StoryInputService.instance;
    }
 
    async initialize() {

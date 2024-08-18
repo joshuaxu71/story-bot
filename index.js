@@ -3,10 +3,18 @@ require('module-alias/register');
 const { Client, GatewayIntentBits, Events, Collection, ReplyMessageOptions } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const { getStoryTitles } = require('@data/mongo/story.js');
-const { insertStoryInput } = require('@data/mongo/storyInput.js');
+const StoryService = require('@data/mongo/story.js');
+const StoryInputService = require('@data/mongo/storyInput.js');
 const { getOngoingStory, setStoryReplyId } = require('@service/story.js');
 const StoryInput = require('@model/storyInput.js');
+const ConfigService = require("@data/mongo/config.js");
+
+async function setup() {
+   const configService = await ConfigService.getInstance();
+   const storyService = await StoryService.getInstance();
+   const storyInputService = await StoryInputService.getInstance();
+}
+setup();
 
 const client = new Client({ intents: [
     GatewayIntentBits.Guilds,

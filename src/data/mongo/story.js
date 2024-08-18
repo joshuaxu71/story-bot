@@ -6,7 +6,19 @@ const { insertConfig } = require("@data/mongo/config.js");
 
 class StoryService {
    constructor() {
+      if (StoryService.instance) {
+         return StoryService.instance;
+      }
       this.collectionName = "stories";
+      StoryService.instance = this;
+   }
+
+   static async getInstance() {
+      if (!StoryService.instance) {
+         StoryService.instance = new StoryService();
+         await StoryService.instance.initialize();
+      }
+      return StoryService.instance;
    }
 
    async initialize() {
