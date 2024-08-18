@@ -29,7 +29,7 @@ class ConfigRepository {
       return executeWithCatch("insertConfig", async () => {
          const config = await this.getConfigByGuildId(guildId);
          if (!config) {
-            await this.collection.insertOne(new Config(guildId, channelId));
+            return await this.collection.insertOne(new Config(guildId, channelId));
          }
       });
    }

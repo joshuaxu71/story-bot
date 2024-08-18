@@ -3,7 +3,6 @@ const StoryRepository = require("@data/mongo/story.js");
 class StoryService {
    async insertStory(story) {
       const storyRepository = await StoryRepository.getInstance();
-      // insertConfig(story.guildId, story.channelId);
 
       story.guildStoryIdentifier = await this.#generateGuildStoryIdentifier(
          story.guildId
@@ -33,18 +32,6 @@ class StoryService {
       } else {
          return `There is no ongoing story to archive.`;
       }
-   }
-
-   async updateStoryLastModifiedData(storyInput) {
-      const storyRepository = await StoryRepository.getInstance();
-      const update = {
-         $set: {
-            lastModifiedDate: new Date(),
-            lastModifiedBy: storyInput.userId,
-         },
-      };
-
-      return await storyRepository.updateStoryById(latestStory._id, update);
    }
 
    async getOngoingStoryContent(guildId) {
@@ -124,4 +111,4 @@ class StoryService {
    }
 }
 
-module.exports = ConfigService;
+module.exports = StoryService;
