@@ -54,58 +54,6 @@ class ConfigRepository {
          return await this.collection.findOne({ guildId: guildId });
       });
    }
-
-   async setLanguageByGuildId(guildId, language) {
-      return executeWithCatch("setLanguageByGuildId", async () => {
-         const languages = language === "ANY" ? [] : [language];
-         return await this.collection.findOneAndUpdate(
-            { guildId: guildId },
-            { $set: { languages: languages } }
-         );
-      });
-   }
-
-   async setPrefixByGuildId(guildId, prefix) {
-      return executeWithCatch("setPrefixByGuildId", async () => {
-         return await this.collection.findOneAndUpdate(
-            { guildId: guildId },
-            { $set: { prefix: prefix + " " } } // Add space so that there's a space between prefix and input
-         );
-      });
-   }
-
-   async isInputValid(message) {
-      return executeWithCatch("isInputValid", async () => {
-         const config = await this.getConfigByGuildId(message.guildId);
-         if (!config || !config.languages.length) {
-            return true;
-         }
-
-         const allowedLanguages = config.languages[0];
-         if (
-            allowedLanguages === "EN" &&
-            this.containsKorean(message.content)
-         ) {
-            return false;
-         } else if (
-            allowedLanguages === "KR" &&
-            this.containsEnglish(message.content)
-         ) {
-            return false;
-         }
-         return true;
-      });
-   }
-
-   containsKorean(str) {
-      const koreanRegex = /[가-힣]/;
-      return koreanRegex.test(str);
-   }
-
-   containsEnglish(str) {
-      const englishRegex = /[a-zA-Z]/;
-      return englishRegex.test(str);
-   }
 }
 
 module.exports = ConfigRepository;
