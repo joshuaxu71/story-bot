@@ -15,6 +15,7 @@ module.exports = {
    async execute(interaction) {
       const configService = new ConfigService();
       const prefix = interaction.options.getString("prefix");
+
       if (await configService.setPrefixByGuildId(interaction.guildId, prefix)) {
          await interaction.reply(`Prefix has been configured successfully.`);
       }

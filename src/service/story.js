@@ -34,6 +34,11 @@ class StoryService {
       }
    }
 
+   async deleteStoriesByGuildId(guildId) {
+      const storyRepository = await StoryRepository.getInstance();
+      return await storyRepository.deleteStoriesByGuildId(guildId);
+   }
+
    async getOngoingStoryContent(guildId) {
       const storyRepository = await StoryRepository.getInstance();
       const story = storyRepository.getOngoingStoryByGuildId(guildId);
@@ -48,6 +53,11 @@ class StoryService {
       );
 
       return this.#generateStoryContent(story);
+   }
+
+   async getStoriesByGuildId(guildId) {
+      const storyRepository = await StoryRepository.getInstance();
+      return await storyRepository.getStoriesByGuildId(guildId);
    }
 
    async setStoryReplyId(client, guildId, messageId) {

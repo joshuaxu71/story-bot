@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { getStoryContentByIdentifier } = require("@service/story.js");
+const StoryService = require("@service/story.js");
 
 module.exports = {
    data: new SlashCommandBuilder()
@@ -13,9 +13,14 @@ module.exports = {
             .setRequired(true)
       ),
    async execute(interaction) {
+      const storyService = await StoryService.getInstance();
       const storyId = interaction.options.getInteger("storyid");
+
       await interaction.reply(
-         await getStoryContentByIdentifier(interaction.guildId, storyId)
+         await storyService.getStoryContentByIdentifier(
+            interaction.guildId,
+            storyId
+         )
       );
    },
 };

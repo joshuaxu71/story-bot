@@ -1,13 +1,17 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { getStoriesByGuildId } = require("@data/mongo/story.js");
+const StoryService = require("@service/story.js");
 
 module.exports = {
    data: new SlashCommandBuilder()
       .setName("stories")
       .setDescription("List all the stories in the guild."),
    async execute(interaction) {
-      const stories = await getStoriesByGuildId(interaction.guildId);
+      const storyService = await StoryService.getInstance();
+      const stories = await storyService.getStoriesByGuildId(
+         interaction.guildId
+      );
+
       storyTitles = [];
       if (stories.length) {
          for (const story of stories) {

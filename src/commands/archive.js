@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { archiveStory } = require("@data/mongo/story.js");
+const StoryService = require("@service/story.js");
 
 module.exports = {
    data: new SlashCommandBuilder()
@@ -15,7 +15,11 @@ module.exports = {
             .setRequired(true)
       ),
    async execute(interaction) {
+      const storyService = await StoryService.getInstance();
       const title = interaction.options.getString("title");
-      await interaction.reply(await archiveStory(interaction.guildId, title));
+
+      await interaction.reply(
+         await storyService.archiveStory(interaction.guildId, title)
+      );
    },
 };

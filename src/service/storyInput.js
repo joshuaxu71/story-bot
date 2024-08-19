@@ -50,6 +50,11 @@ class StoryInputService {
       await this.#updateStoryLastModifiedData(storyRepository, storyInput);
    }
 
+   async deleteStoryInputsByGuildId(guildId) {
+      const storyInputRepository = await StoryInputRepository.getInstance();
+      return await storyInputRepository.deleteStoryInputsByGuildId(guildId);
+   }
+
    async #isInputValid(message, languages) {
       if (!languages.length) {
          return true;

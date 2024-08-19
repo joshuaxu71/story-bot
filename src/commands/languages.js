@@ -22,6 +22,7 @@ module.exports = {
    async execute(interaction) {
       const configService = new ConfigService();
       const language = interaction.options.getString("language");
+
       if (
          await configService.setLanguageByGuildId(interaction.guildId, language)
       ) {

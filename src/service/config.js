@@ -14,6 +14,11 @@ class ConfigService {
       const update = { $set: { prefix: prefix } };
       return await configRepository.updateConfigByGuildId(guildId, update);
    }
+
+   async deleteConfigsByGuildId(guildId) {
+      const configRepository = await ConfigRepository.getInstance();
+      return await configRepository.deleteConfigsByGuildId(guildId);
+   }
 }
 
 module.exports = ConfigService;
