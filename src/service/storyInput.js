@@ -16,15 +16,15 @@ class StoryInputService {
          );
       }
 
-      const hasPrefix = message.content.startsWith(config.prefix);
-      if (!hasPrefix) {
+      const isUsingPrefix = message.content.startsWith(config.prefix);
+      if (!isUsingPrefix) {
          return;
       }
       message.content = message.content.slice(config.prefix.length);
 
-      const isValid = await this.#isInputValid(message, config);
+      const isValid = await this.#isInputValid(message, config.languages);
       if (!isValid) {
-         return "Input is invalid. Please check the supported language.";
+         return `Input is invalid. Only ${config.languages[0]} inputs are accepted.`;
       }
 
       const storyInput = new StoryInput(message);
@@ -50,12 +50,12 @@ class StoryInputService {
       await this.#updateStoryLastModifiedData(storyRepository, storyInput);
    }
 
-   async #isInputValid(message, config) {
-      if (!config.languages.length) {
+   async #isInputValid(message, languages) {
+      if (!languages.length) {
          return true;
       }
 
-      const allowedLanguages = config.languages[0];
+      const allowedLanguages = languages[0];
       if (allowedLanguages === "EN" && this.#containsKorean(message.content)) {
          return false;
       } else if (
