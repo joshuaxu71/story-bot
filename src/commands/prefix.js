@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require("discord.js");
 
 const ConfigService = require("@service/config.js");
 
+const configService = new ConfigService();
+
 module.exports = {
    data: new SlashCommandBuilder()
       .setName("prefix")
@@ -13,7 +15,6 @@ module.exports = {
             .setRequired(true)
       ),
    async execute(interaction) {
-      const configService = new ConfigService();
       const prefix = interaction.options.getString("prefix");
 
       if (await configService.setPrefixByGuildId(interaction.guildId, prefix)) {

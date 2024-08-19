@@ -1,18 +1,7 @@
 const StoryRepository = require("@data/story.js");
+const StoryInputRepository = require("@data/storyInput.js");
 
 class StoryService {
-   async insertStory(story) {
-      const storyRepository = await StoryRepository.getInstance();
-
-      story.guildStoryIdentifier = await this.#generateGuildStoryIdentifier(
-         story.guildId
-      );
-      story.createdDate = new Date();
-      story.lastModifiedDate = new Date();
-      const result = await storyRepository.insertStory(story);
-      return result.insertedId;
-   }
-
    async archiveStory(guildId, title) {
       const storyRepository = await StoryRepository.getInstance();
       const update = {
@@ -41,7 +30,7 @@ class StoryService {
 
    async getOngoingStoryContent(guildId) {
       const storyRepository = await StoryRepository.getInstance();
-      const story = storyRepository.getOngoingStoryByGuildId(guildId);
+      const story = await storyRepository.getOngoingStoryByGuildId(guildId);
       return this.#generateStoryContent(story);
    }
 
@@ -62,7 +51,7 @@ class StoryService {
 
    async setStoryReplyId(client, guildId, messageId) {
       const storyRepository = await StoryRepository.getInstance();
-      const story = storyRepository.getOngoingStoryByGuildId(guildId);
+      const story = await storyRepository.getOngoingStoryByGuildId(guildId);
       if (story) {
          this.#removePreviousStoryReply(client, story.channelId, story.replyId);
          this.#updateStoryReplyId(story._id, messageId);
@@ -73,20 +62,13 @@ class StoryService {
       }
    }
 
-   async #generateGuildStoryIdentifier(guildId) {
-      const storyRepository = await StoryRepository.getInstance();
-      const latestStory = storyRepository.getLatestStoryByGuildId(guildId);
-
-      if (latestStory) {
-         return latestStory.guildStoryIdentifier + 1;
-      }
-      return 1;
-   }
-
    async #generateStoryContent(story) {
       var storyContent = "";
       if (story) {
-         // const storyInputs = await getStoryInputsByStoryId(story._id);
+         const storyInputRepository = await StoryInputRepository.getInstance();
+         const storyInputs = await storyInputRepository.getStoryInputsByStoryId(
+            story._id
+         );
          if (storyInputs.length) {
             for (const storyInput of storyInputs) {
                storyContent += " " + storyInput.message;

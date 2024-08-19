@@ -23,6 +23,16 @@ class StoryRepository {
 
    async insertStory(story) {
       return executeWithCatch("insertStory", async () => {
+         const latestStory = await this.getLatestStoryByGuildId(story.guildId);
+
+         let guildStoryIdentifier = 1;
+         if (latestStory) {
+            guildStoryIdentifier = latestStory.guildStoryIdentifier + 1;
+         }
+
+         story.guildStoryIdentifier = guildStoryIdentifier;
+         story.createdDate = new Date();
+         story.lastModifiedDate = new Date();
          const result = await this.collection.insertOne(story);
          return result.insertedId;
       });

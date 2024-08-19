@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require("discord.js");
 
 const StoryService = require("@service/story.js");
 
+const storyService = new StoryService();
+
 module.exports = {
    data: new SlashCommandBuilder()
       .setName("archive")
@@ -15,7 +17,6 @@ module.exports = {
             .setRequired(true)
       ),
    async execute(interaction) {
-      const storyService = await StoryService.getInstance();
       const title = interaction.options.getString("title");
 
       await interaction.reply(

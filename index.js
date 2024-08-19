@@ -7,6 +7,9 @@ const path = require('path');
 const StoryService = require("@service/story.js");
 const StoryInputService = require("@service/storyInput.js");
 
+const storyService = new StoryService();
+const storyInputService = new StoryInputService();
+
 const client = new Client({ intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
@@ -33,9 +36,6 @@ client.on('ready', () => {
 
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return; // Ignore bot messages
-
-    const storyService = await StoryService.getInstance();
-    const storyInputService = await StoryInputService.getInstance();
 
     const result = await storyInputService.insertStoryInput(message);
     if (result) {

@@ -1,6 +1,8 @@
 const ConfigRepository = require("@data/config.js");
 const StoryRepository = require("@data/story.js");
 const StoryInputRepository = require("@data/storyInput.js");
+const Story = require("@model/story.js");
+const StoryInput = require("@model/storyInput.js");
 
 class StoryInputService {
    async insertStoryInput(message) {
@@ -8,7 +10,7 @@ class StoryInputService {
       const storyRepository = await StoryRepository.getInstance();
       const storyInputRepository = await StoryInputRepository.getInstance();
 
-      const config = await configRepository.getConfigByGuildId(message.guildId);
+      let config = await configRepository.getConfigByGuildId(message.guildId);
       if (!config) {
          config = await configRepository.insertConfig(
             message.guildId,
@@ -46,7 +48,7 @@ class StoryInputService {
       }
 
       storyInput.createdDate = new Date();
-      storyInputRepository.insertOne(storyInput);
+      storyInputRepository.insertStoryInput(storyInput);
       await this.#updateStoryLastModifiedData(storyRepository, storyInput);
    }
 

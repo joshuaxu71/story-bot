@@ -1,7 +1,7 @@
 class Config {
    guildId;
    channelId;
-   prefix = ":writing_hand: ";
+   prefix = "✍️ ";
    languages = [];
    endingText;
    minStoryInputLength;

@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require("discord.js");
 
 const ConfigService = require("@service/config.js");
 
+const configService = new ConfigService();
+
 module.exports = {
    data: new SlashCommandBuilder()
       .setName("language")
@@ -20,7 +22,6 @@ module.exports = {
             )
       ),
    async execute(interaction) {
-      const configService = new ConfigService();
       const language = interaction.options.getString("language");
 
       if (
