@@ -1,4 +1,4 @@
-const ConfigRepository = require("@data/mongo/config.js");
+const ConfigRepository = require("@data/config.js");
 
 class ConfigService {
    async setLanguageByGuildId(guildId, language) {

@@ -1,7 +1,4 @@
-const {
-   executeWithCatch,
-   getDatabaseCollection,
-} = require("@data/mongo/dbHelper.js");
+const { executeWithCatch, getDatabaseCollection } = require("@data/mongo.js");
 
 class StoryRepository {
    constructor() {
@@ -33,10 +30,7 @@ class StoryRepository {
 
    async updateStoryById(id, update) {
       return executeWithCatch("updateConfigByGuildId", async () => {
-         return await this.collection.findOneAndUpdate(
-            { _id: id },
-            update
-         );
+         return await this.collection.findOneAndUpdate({ _id: id }, update);
       });
    }
 
@@ -72,7 +66,7 @@ class StoryRepository {
             .limit(1)
             .toArray();
          if (latestStory.length) {
-            return latestStory[0]
+            return latestStory[0];
          }
       });
    }

@@ -1,7 +1,4 @@
-const {
-   executeWithCatch,
-   getDatabaseCollection,
-} = require("@data/mongo/dbHelper.js");
+const { executeWithCatch, getDatabaseCollection } = require("@data/mongo.js");
 
 class StoryInputRepository {
    constructor() {

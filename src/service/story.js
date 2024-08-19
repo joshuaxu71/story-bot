@@ -1,4 +1,4 @@
-const StoryRepository = require("@data/mongo/story.js");
+const StoryRepository = require("@data/story.js");
 
 class StoryService {
    async insertStory(story) {

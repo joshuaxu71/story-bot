@@ -1,7 +1,4 @@
-const {
-   getDatabaseCollection,
-   executeWithCatch,
-} = require("@data/mongo/dbHelper.js");
+const { getDatabaseCollection, executeWithCatch } = require("@data/mongo.js");
 const Config = require("@model/config.js");
 
 class ConfigRepository {
@@ -29,7 +26,9 @@ class ConfigRepository {
       return executeWithCatch("insertConfig", async () => {
          const config = await this.getConfigByGuildId(guildId);
          if (!config) {
-            return await this.collection.insertOne(new Config(guildId, channelId));
+            return await this.collection.insertOne(
+               new Config(guildId, channelId)
+            );
          }
       });
    }
