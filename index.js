@@ -1,20 +1,11 @@
 require('dotenv').config();
 require('module-alias/register');
-const { Client, GatewayIntentBits, Events, Collection, ReplyMessageOptions } = require('discord.js');
+const { Client, GatewayIntentBits, Events, Collection } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const StoryRepository = require('@data/mongo/story.js');
-const StoryInputRepository = require('@data/mongo/storyInput.js');
-const { getOngoingStory, setStoryReplyId } = require('@service/story.js');
-const StoryInput = require('@model/storyInput.js');
-const ConfigRepository = require("@data/mongo/config.js");
 
-async function setup() {
-   const configService = await ConfigRepository.getInstance();
-   const storyService = await StoryRepository.getInstance();
-   const storyInputService = await StoryInputRepository.getInstance();
-}
-setup();
+const StoryService = require("@service/story.js");
+const StoryInputService = require("@service/storyInput.js");
 
 const client = new Client({ intents: [
     GatewayIntentBits.Guilds,
@@ -43,26 +34,31 @@ client.on('ready', () => {
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return; // Ignore bot messages
 
-    const result = await insertStoryInput(message);
+    const storyService = await StoryService.getInstance();
+    const storyInputService = await StoryInputService.getInstance();
+
+    const result = await storyInputService.insertStoryInput(message);
     if (result) {
         if (result === "Not using prefix, not story input") {
             return;
         }
         
-        const reply = await message.reply({
+        // There is an error message to be shown
+        await message.reply({
             content: result,
             allowedMentions: {
                 repliedUser: false
             }
         });
     } else {
+        // The input is recorded properly
         const reply = await message.reply({
-            content: await getOngoingStory(message.guildId),
+            content: await storyService.getOngoingStoryContent(message.guildId),
             allowedMentions: {
                 repliedUser: false
             }
         });
-        setStoryReplyId(client, reply.guildId, reply.id);
+        storyService.setStoryReplyId(client, reply.guildId, reply.id);
     }
 });
 
