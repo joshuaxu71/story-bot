@@ -1,6 +1,7 @@
 const ConfigRepository = require("@data/config.js");
 const StoryRepository = require("@data/story.js");
 const StoryInputRepository = require("@data/storyInput.js");
+const Config = require("@model/config.js");
 const Story = require("@model/story.js");
 const StoryInput = require("@model/storyInput.js");
 
@@ -11,18 +12,26 @@ class StoryInputService {
       const storyInputRepository = await StoryInputRepository.getInstance();
 
       let config = await configRepository.getConfigByGuildId(message.guildId);
+      let prefix;
+      if (!config) {
+         prefix = Config.DEFAULT_PREFIX;
+      } else {
+         prefix = config.prefix;
+      }
+
+      const isUsingPrefix = message.content.startsWith(prefix);
+      if (!isUsingPrefix) {
+         return;
+      }
+      message.content = message.content.slice(prefix.length);
+
+      // If config was null, create config now
       if (!config) {
          config = await configRepository.insertConfig(
             message.guildId,
             message.channelId
          );
       }
-
-      const isUsingPrefix = message.content.startsWith(config.prefix);
-      if (!isUsingPrefix) {
-         return;
-      }
-      message.content = message.content.slice(config.prefix.length);
 
       const isValid = await this.#isInputValid(message, config.languages);
       if (!isValid) {
@@ -50,6 +59,7 @@ class StoryInputService {
       storyInput.createdDate = new Date();
       storyInputRepository.insertStoryInput(storyInput);
       await this.#updateStoryLastModifiedData(storyRepository, storyInput);
+      return "success";
    }
 
    async deleteStoryInputsByGuildId(guildId) {
