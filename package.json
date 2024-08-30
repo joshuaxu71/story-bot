@@ -1,27 +1,27 @@
 {
-  "name": "story-bot",
-  "version": "1.0.0",
-  "description": "A discord bot that will compile user inputs into a story.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "joshuaxu71",
-  "license": "ISC",
-  "dependencies": {
-    "discord.js": "^14.15.3",
-    "dotenv": "^16.4.5",
-    "module-alias": "^2.2.3",
-    "mongodb": "^6.8.0",
-    "story-bot": "file:"
-  },
-  "_moduleAliases": {
-    "@app": "src/app",
-    "@commands": "src/commands",
-    "@data": "src/data",
-    "@model": "src/model"
-  },
-  "devDependencies": {
-    "@flydotio/dockerfile": "^0.5.8"
-  }
+   "name": "story-weaver",
+   "version": "1.0.0",
+   "description": "A discord bot that will compile user inputs into a story.",
+   "main": "index.js",
+   "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+   },
+   "author": "joshuaxu71",
+   "license": "ISC",
+   "dependencies": {
+      "discord.js": "^14.15.3",
+      "dotenv": "^16.4.5",
+      "module-alias": "^2.2.3",
+      "mongodb": "^6.8.0",
+      "story-bot": "file:"
+   },
+   "_moduleAliases": {
+      "@commands": "src/commands",
+      "@data": "src/data",
+      "@model": "src/model",
+      "@service": "src/service"
+   },
+   "devDependencies": {
+      "@flydotio/dockerfile": "^0.5.8"
+   }
 }
