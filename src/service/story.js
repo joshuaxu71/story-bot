@@ -36,12 +36,12 @@ class StoryService {
 
    async getStoryContentByIdentifier(guildId, guildStoryIdentifier) {
       const storyRepository = await StoryRepository.getInstance();
-      const story = storyRepository.getStoryByGuildIdAndIdentifier(
+      const story = await storyRepository.getStoryByGuildIdAndIdentifier(
          guildId,
          guildStoryIdentifier
       );
 
-      return this.#generateStoryContent(story);
+      return await this.#generateStoryContent(story);
    }
 
    async getStoriesByGuildId(guildId) {
