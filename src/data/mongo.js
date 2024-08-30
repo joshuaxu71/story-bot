@@ -44,4 +44,5 @@ async function connectToDatabase() {
 module.exports = {
    getDatabaseCollection,
    executeWithCatch,
+   connectToDatabase,
 };

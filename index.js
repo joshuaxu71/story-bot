@@ -4,6 +4,7 @@ const { Client, GatewayIntentBits, Events, Collection } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
 
+const { connectToDatabase } = require("@data/mongo.js");
 const StoryService = require("@service/story.js");
 const StoryInputService = require("@service/storyInput.js");
 
@@ -38,6 +39,7 @@ for (const file of commandFiles) {
 
 client.on("ready", () => {
    console.log("Ready");
+   connectToDatabase();
 });
 
 client.on("messageCreate", async (message) => {
