@@ -7,7 +7,7 @@ const storyService = new StoryService();
 module.exports = {
    data: new SlashCommandBuilder()
       .setName("stories")
-      .setDescription("List all the stories in the guild."),
+      .setDescription("Lists all the stories in the guild."),
    async execute(interaction) {
       const stories = await storyService.getStoriesByGuildId(
          interaction.guildId

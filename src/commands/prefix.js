@@ -7,7 +7,7 @@ const configService = new ConfigService();
 module.exports = {
    data: new SlashCommandBuilder()
       .setName("prefix")
-      .setDescription("Configure what the prefix should be for story inputs.")
+      .setDescription("Configure what the prefix is for story inputs.")
       .addStringOption((option) =>
          option
             .setName("prefix")

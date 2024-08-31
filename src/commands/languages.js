@@ -8,7 +8,7 @@ module.exports = {
    data: new SlashCommandBuilder()
       .setName("language")
       .setDescription(
-         "Configure what language is accepted for the story inputs."
+         "Configure what language input is valid for the story inputs."
       )
       .addStringOption((option) =>
          option

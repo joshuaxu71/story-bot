@@ -7,7 +7,7 @@ const storyService = new StoryService();
 module.exports = {
    data: new SlashCommandBuilder()
       .setName("story")
-      .setDescription("Shows the content of the story ID.")
+      .setDescription("Shows the content of the story.")
       .addIntegerOption((option) =>
          option
             .setName("storyid")

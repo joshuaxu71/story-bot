@@ -7,9 +7,7 @@ const storyService = new StoryService();
 module.exports = {
    data: new SlashCommandBuilder()
       .setName("archive")
-      .setDescription(
-         "Archives the current ongoing story story and start a new one."
-      )
+      .setDescription("Archives the current ongoing story and start a new one.")
       .addStringOption((option) =>
          option
             .setName("title")
