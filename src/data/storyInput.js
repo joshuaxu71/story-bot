@@ -27,6 +27,12 @@ class StoryInputRepository {
       });
    }
 
+   async deleteStoryInputById(id) {
+      return executeWithCatch("deleteStoryInputById", async () => {
+         return await this.collection.deleteOne({ _id: id });
+      });
+   }
+
    async deleteStoryInputsByGuildId(guildId) {
       return executeWithCatch("deleteStoryInputsByGuildId", async () => {
          return await this.collection.deleteMany({ guildId: guildId });
@@ -35,10 +41,7 @@ class StoryInputRepository {
 
    async getStoryInputsByStoryId(storyId) {
       return executeWithCatch("getStoryInputsByStoryId", async () => {
-         return await this.collection
-            .find({ storyId: storyId })
-            .sort({ createdDate: 1 })
-            .toArray();
+         return await this.collection.find({ storyId: storyId }).sort({ createdDate: 1 }).toArray();
       });
    }
 }

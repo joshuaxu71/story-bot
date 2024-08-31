@@ -1,3 +1,5 @@
+const { ObjectId } = require("mongodb");
+
 const ConfigRepository = require("@data/config.js");
 const StoryRepository = require("@data/story.js");
 const StoryInputRepository = require("@data/storyInput.js");
@@ -47,6 +49,11 @@ class StoryInputService {
       storyInputRepository.insertStoryInput(storyInput);
       await this.#updateStoryLastModifiedData(storyRepository, storyInput);
       return "success";
+   }
+
+   async deleteStoryInputById(id) {
+      const storyInputRepository = await StoryInputRepository.getInstance();
+      return await storyInputRepository.deleteStoryInputById(ObjectId.createFromHexString(id));
    }
 
    async deleteStoryInputsByGuildId(guildId) {
