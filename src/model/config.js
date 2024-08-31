@@ -4,7 +4,7 @@ class Config {
    prefix;
    languages = [];
    endingText;
-   minStoryInputLength;
+   minStoryInputCharacterCount;
 
    constructor(guildId, channelId) {
       this.guildId = guildId;

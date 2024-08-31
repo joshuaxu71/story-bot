@@ -15,6 +15,14 @@ class ConfigService {
       return await configRepository.updateConfigByGuildId(guildId, update);
    }
 
+   async setMinStoryInputCharacterCountByGuildId(guildId, minStoryInputCharacterCount) {
+      const configRepository = await ConfigRepository.getInstance();
+      const update = {
+         $set: { minStoryInputCharacterCount: minStoryInputCharacterCount },
+      };
+      return await configRepository.updateConfigByGuildId(guildId, update);
+   }
+
    async deleteConfigsByGuildId(guildId) {
       const configRepository = await ConfigRepository.getInstance();
       return await configRepository.deleteConfigsByGuildId(guildId);
