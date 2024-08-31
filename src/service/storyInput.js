@@ -54,6 +54,27 @@ class StoryInputService {
       return await storyInputRepository.deleteStoryInputsByGuildId(guildId);
    }
 
+   async getStoryInputsByStoryGuildIdentifier(guildId, guildStoryIdentifier) {
+      const storyRepository = await StoryRepository.getInstance();
+      const storyInputRepository = await StoryInputRepository.getInstance();
+
+      let story;
+      if (guildStoryIdentifier) {
+         story = await storyRepository.getStoryByGuildIdAndIdentifier(
+            guildId,
+            guildStoryIdentifier
+         );
+      } else {
+         story = await storyRepository.getOngoingStoryByGuildId(guildId);
+      }
+
+      if (!story) {
+         return;
+      }
+
+      return await storyInputRepository.getStoryInputsByStoryId(story._id);
+   }
+
    #isUsingPrefix(message, config) {
       let prefix;
       if (!config) {
