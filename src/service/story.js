@@ -23,6 +23,27 @@ class StoryService {
       }
    }
 
+   async renameStory(guildId, guildStoryIdentifier, newTitle) {
+      const storyRepository = await StoryRepository.getInstance();
+      const update = {
+         $set: {
+            title: newTitle,
+         },
+      };
+
+      const story = await storyRepository.getStoryByGuildIdAndIdentifier(
+         guildId,
+         guildStoryIdentifier
+      );
+
+      if (story) {
+         await storyRepository.updateStoryById(story._id, update);
+         return `The story has been renamed to \`${newTitle}\` successfully.`;
+      } else {
+         return `There is no story with that ID.`;
+      }
+   }
+
    async deleteStoriesByGuildId(guildId) {
       const storyRepository = await StoryRepository.getInstance();
       return await storyRepository.deleteStoriesByGuildId(guildId);
