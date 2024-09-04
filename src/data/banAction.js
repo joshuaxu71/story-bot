@@ -62,6 +62,7 @@ class BanActionRepository {
                },
                { $replaceRoot: { newRoot: "$latestBan" } },
                { $match: { type: BanType.BAN } },
+               { $sort: { createdDate: 1 } },
             ])
             .toArray();
       });

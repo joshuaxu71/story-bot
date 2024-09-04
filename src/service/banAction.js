@@ -29,6 +29,11 @@ class BanActionService {
          return `The user \`${banAction.userUsername}\` has been unbanned successfully.`;
       }
    }
+
+   async getCurrentBansByGuildId(guildId) {
+      const banActionRepository = await BanActionRepository.getInstance();
+      return await banActionRepository.getCurrentBansByGuildId(guildId);
+   }
 }
 
 module.exports = BanActionService;
