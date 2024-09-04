@@ -1,28 +1,8 @@
+const ConfigRepository = require("@data/config.js");
 const StoryRepository = require("@data/story.js");
 const StoryInputRepository = require("@data/storyInput.js");
 
 class StoryService {
-   async archiveStory(guildId, title) {
-      const storyRepository = await StoryRepository.getInstance();
-      const update = {
-         $set: {
-            title: title,
-            archived: true,
-         },
-      };
-
-      const latestStory = await storyRepository.getOngoingStoryByGuildId(
-         guildId
-      );
-
-      if (latestStory) {
-         await storyRepository.updateStoryById(latestStory._id, update);
-         return `The ongoing story has been archived with the title \`${title}\``;
-      } else {
-         return `There is no ongoing story to archive.`;
-      }
-   }
-
    async renameStory(guildId, guildStoryIdentifier, newTitle) {
       const storyRepository = await StoryRepository.getInstance();
       const update = {
@@ -49,10 +29,9 @@ class StoryService {
       return await storyRepository.deleteStoriesByGuildId(guildId);
    }
 
-   async getOngoingStoryContent(guildId) {
+   async getOngoingStory(guildId) {
       const storyRepository = await StoryRepository.getInstance();
-      const story = await storyRepository.getOngoingStoryByGuildId(guildId);
-      return this.#generateStoryContent(story);
+      return await storyRepository.getOngoingStoryByGuildId(guildId);
    }
 
    async getStoryContentByIdentifier(guildId, guildStoryIdentifier) {
@@ -62,7 +41,7 @@ class StoryService {
          guildStoryIdentifier
       );
 
-      return await this.#generateStoryContent(story);
+      return await generateStoryContent(story);
    }
 
    async getStoriesByGuildId(guildId) {
@@ -70,26 +49,25 @@ class StoryService {
       return await storyRepository.getStoriesByGuildId(guildId);
    }
 
-   async setStoryReplyId(client, guildId, messageId) {
-      const storyRepository = await StoryRepository.getInstance();
-      const story = await storyRepository.getOngoingStoryByGuildId(guildId);
-      if (story) {
-         this.#removePreviousStoryReply(client, story.channelId, story.replyId);
-         this.#updateStoryReplyId(story._id, messageId);
-      } else {
-         console.warn(
-            `Warn setStoryReplyId ongoing story for guild ${guildId} does not exist.`
-         );
+   async setStoryReplyId(client, story, messageId) {
+      await this.#removePreviousStoryReply(client, story.channelId, story.replyId);
+      await this.#updateStoryReplyId(story._id, messageId);
+   }
+
+   async endStory(message, story) {
+      const configRepository = await ConfigRepository.getInstance();
+
+      const config = await configRepository.getConfigByGuildId(message.guildId);
+      if (message.content.endsWith(config.endingSuffix)) {
+         return await this.#archiveStory(story);
       }
    }
 
-   async #generateStoryContent(story) {
+   async generateStoryContent(story) {
       var storyContent = "";
       if (story) {
          const storyInputRepository = await StoryInputRepository.getInstance();
-         const storyInputs = await storyInputRepository.getStoryInputsByStoryId(
-            story._id
-         );
+         const storyInputs = await storyInputRepository.getStoryInputsByStoryId(story._id);
          if (storyInputs.length) {
             for (const storyInput of storyInputs) {
                storyContent += " " + storyInput.message;
@@ -104,6 +82,21 @@ class StoryService {
       return storyContent;
    }
 
+   async #archiveStory(story) {
+      const storyRepository = await StoryRepository.getInstance();
+
+      const title = `Archived Story ${story.guildStoryIdentifier}`;
+      const update = {
+         $set: {
+            title: title,
+            archived: true,
+         },
+      };
+
+      await storyRepository.updateStoryById(story._id, update);
+      return `The ongoing story has been archived with the title \`${title}\``;
+   }
+
    async #updateStoryReplyId(storyId, messageId) {
       const storyRepository = await StoryRepository.getInstance();
       const update = { $set: { replyId: messageId } };
@@ -114,12 +107,13 @@ class StoryService {
       try {
          const channel = await client.channels.fetch(channelId);
          const message = await channel.messages.fetch(replyId);
-
-         if (message) {
-            await message.delete();
-         }
+         await message.delete();
       } catch (err) {
-         console.error("Error removePreviousStoryReply:", err);
+         if (err.code === 10008) {
+            console.warn(`Message with ID ${replyId} is not found or already deleted`);
+         } else {
+            console.error("Error removePreviousStoryReply:", err);
+         }
       }
    }
 }

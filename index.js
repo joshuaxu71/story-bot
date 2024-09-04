@@ -48,13 +48,25 @@ client.on("messageCreate", async (message) => {
    const result = await storyInputService.insertStoryInput(message);
    if (result === "success") {
       // The input is recorded properly
+      const story = await storyService.getOngoingStory(message.guildId);
+
       const reply = await message.reply({
-         content: await storyService.getOngoingStoryContent(message.guildId),
+         content: await storyService.generateStoryContent(story),
          allowedMentions: {
             repliedUser: false,
          },
       });
-      storyService.setStoryReplyId(client, reply.guildId, reply.id);
+      await storyService.setStoryReplyId(client, story, reply.id);
+
+      const endStoryResult = await storyService.endStory(message, story);
+      if (endStoryResult) {
+         await message.reply({
+            content: endStoryResult,
+            allowedMentions: {
+               repliedUser: false,
+            },
+         });
+      }
    } else if (result) {
       // There is an error message to be shown
       await message.reply({
