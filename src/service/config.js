@@ -15,6 +15,12 @@ class ConfigService {
       return await configRepository.updateConfigByGuildId(guildId, update);
    }
 
+   async setEndingSuffixByGuildId(guildId, suffix) {
+      const configRepository = await ConfigRepository.getInstance();
+      const update = { $set: { endingSuffix: suffix } };
+      return await configRepository.updateConfigByGuildId(guildId, update);
+   }
+
    async setMinStoryInputCharacterCountByGuildId(guildId, minStoryInputCharacterCount) {
       const configRepository = await ConfigRepository.getInstance();
       const update = {
