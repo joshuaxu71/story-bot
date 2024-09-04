@@ -17,8 +17,6 @@ module.exports = {
    async execute(interaction) {
       const title = interaction.options.getString("title");
 
-      await interaction.reply(
-         await storyService.archiveStory(interaction.guildId, title)
-      );
+      await interaction.reply(await storyService.archiveStory(interaction.guildId, title));
    },
 };

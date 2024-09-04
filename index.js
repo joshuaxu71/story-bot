@@ -23,7 +23,7 @@ client.commands = new Collection();
 const commandsPath = path.join(__dirname, "src/commands");
 const commandFiles = fs
    .readdirSync(commandsPath)
-   .filter((file) => file.endsWith(".js"));
+   .filter((file) => !file.startsWith("deprecated_") && file.endsWith(".js"));
 
 for (const file of commandFiles) {
    const filePath = path.join(commandsPath, file);
@@ -72,9 +72,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
    const command = interaction.client.commands.get(interaction.commandName);
 
    if (!command) {
-      console.error(
-         `No command matching ${interaction.commandName} was found.`
-      );
+      console.error(`No command matching ${interaction.commandName} was found.`);
       return;
    }
 
