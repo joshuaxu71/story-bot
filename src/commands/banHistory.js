@@ -30,13 +30,13 @@ module.exports = {
       if (banActions.length) {
          for (const banAction of banActions) {
             banHistory.push(
-               `actor ID: ${banAction.actorId}\nactor username: ${banAction.actorUsername}\nuser ID: ${banAction.userId}\nuser username: ${banAction.userUsername}\nnote: ${banAction.note}`
+               `Date: ${banAction.createdDate}\nActor ID: ${banAction.actorId}\nActor Username: ${banAction.actorUsername}\nUser ID: ${banAction.userId}\nUser Username: ${banAction.userUsername}\nNote: ${banAction.note}`
             );
          }
       }
 
       if (!banActions.length) {
-         banHistory.push("There are no banned users.");
+         banHistory.push("There are no bans yet.");
       }
 
       await interaction.reply({
