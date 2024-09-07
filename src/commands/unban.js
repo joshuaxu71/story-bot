@@ -13,12 +13,12 @@ module.exports = {
          option.setName("user").setDescription("The user to unban").setRequired(true)
       )
       .addStringOption((option) =>
-         option.setName("reason").setDescription("The reason for the unban").setRequired(false)
+         option.setName("note").setDescription("The note for the unban").setRequired(false)
       ),
    async execute(interaction) {
       const actor = interaction.user;
       const user = interaction.options.getUser("user");
-      const reason = interaction.options.getUser("reason");
+      const note = interaction.options.getUser("note");
 
       const banAction = new BanAction(
          interaction.guildId,
@@ -27,7 +27,7 @@ module.exports = {
          user.id,
          user.username,
          BanType.UNBAN,
-         reason
+         note
       );
 
       const response = await banActionService.insertBanAction(banAction);

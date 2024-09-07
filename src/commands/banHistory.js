@@ -31,7 +31,7 @@ module.exports = {
       if (banActions.length) {
          for (const banAction of banActions) {
             banHistory.push(
-               `actor ID: ${banAction.actorId}\nactor username: ${banAction.actorUsername}\nuser ID: ${banAction.userId}\nuser username: ${banAction.userUsername}\nreason: ${banAction.reason}`
+               `actor ID: ${banAction.actorId}\nactor username: ${banAction.actorUsername}\nuser ID: ${banAction.userId}\nuser username: ${banAction.userUsername}\nnote: ${banAction.note}`
             );
          }
       }
