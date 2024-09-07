@@ -4,6 +4,7 @@ const { Client, GatewayIntentBits, Events, Collection } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
 
+const { isUserBanned } = require("@auth/auth.js");
 const { connectToDatabase } = require("@data/mongo.js");
 const StoryService = require("@service/story.js");
 const StoryInputService = require("@service/storyInput.js");
@@ -44,6 +45,7 @@ client.on("ready", () => {
 
 client.on("messageCreate", async (message) => {
    if (message.author.bot) return; // Ignore bot messages
+   if (await isUserBanned(message.guildId, message.author.id)) return; // Ignore banned users
 
    const result = await storyInputService.insertStoryInput(message);
    if (result === "success") {

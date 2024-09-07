@@ -1,8 +1,22 @@
 const { SlashCommandBuilder } = require("discord.js");
 
+const { withBanCheck } = require("@auth/auth.js");
 const ConfigService = require("@service/config.js");
 
 const configService = new ConfigService();
+
+async function execute(interaction) {
+   const minStoryInputCharacterCount = interaction.options.getInteger("count");
+
+   if (
+      await configService.setMinStoryInputCharacterCountByGuildId(
+         interaction.guildId,
+         minStoryInputCharacterCount
+      )
+   ) {
+      await interaction.reply(`Minimum character count has been configured successfully.`);
+   }
+}
 
 module.exports = {
    data: new SlashCommandBuilder()
@@ -14,16 +28,5 @@ module.exports = {
             .setDescription("Minimum character count for story inputs")
             .setRequired(true)
       ),
-   async execute(interaction) {
-      const minStoryInputCharacterCount = interaction.options.getInteger("count");
-
-      if (
-         await configService.setMinStoryInputCharacterCountByGuildId(
-            interaction.guildId,
-            minStoryInputCharacterCount
-         )
-      ) {
-         await interaction.reply(`Minimum character count has been configured successfully.`);
-      }
-   },
+   execute: withBanCheck(execute),
 };

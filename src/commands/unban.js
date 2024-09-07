@@ -1,9 +1,34 @@
 const { SlashCommandBuilder } = require("discord.js");
 
+const { withBanCheck } = require("@auth/auth.js");
 const BanActionService = require("@service/banAction.js");
 const { BanAction, BanType } = require("@model/banAction.js");
 
 const banActionService = new BanActionService();
+
+async function execute(interaction) {
+   const actor = interaction.user;
+   const user = interaction.options.getUser("user");
+   const note = interaction.options.getUser("note");
+
+   const banAction = new BanAction(
+      interaction.guildId,
+      actor.id,
+      actor.username,
+      user.id,
+      user.username,
+      BanType.UNBAN,
+      note
+   );
+
+   const response = await banActionService.insertBanAction(banAction);
+   if (response) {
+      await interaction.reply({
+         content: response,
+         ephemeral: true,
+      });
+   }
+}
 
 module.exports = {
    data: new SlashCommandBuilder()
@@ -15,27 +40,5 @@ module.exports = {
       .addStringOption((option) =>
          option.setName("note").setDescription("The note for the unban").setRequired(false)
       ),
-   async execute(interaction) {
-      const actor = interaction.user;
-      const user = interaction.options.getUser("user");
-      const note = interaction.options.getUser("note");
-
-      const banAction = new BanAction(
-         interaction.guildId,
-         actor.id,
-         actor.username,
-         user.id,
-         user.username,
-         BanType.UNBAN,
-         note
-      );
-
-      const response = await banActionService.insertBanAction(banAction);
-      if (response) {
-         await interaction.reply({
-            content: response,
-            ephemeral: true,
-         });
-      }
-   },
+   execute: withBanCheck(execute),
 };
