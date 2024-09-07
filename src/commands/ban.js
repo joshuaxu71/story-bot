@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { withBanCheck } = require("@auth/auth.js");
+const { withBanCheck, invalidateBanCache } = require("@auth/auth.js");
 const BanActionService = require("@service/banAction.js");
 const { BanAction, BanType } = require("@model/banAction.js");
 
@@ -28,6 +28,7 @@ async function execute(interaction) {
          ephemeral: true,
       });
    }
+   invalidateBanCache(interaction.guildId, user.id);
 }
 
 module.exports = {
