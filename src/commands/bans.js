@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
 const BanActionService = require("@service/banAction.js");
-const { BanAction, BanType } = require("@model/banAction.js");
 
 const banActionService = new BanActionService();
 
