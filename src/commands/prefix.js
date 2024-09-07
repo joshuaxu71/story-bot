@@ -6,6 +6,7 @@ const ConfigService = require("@service/config.js");
 const configService = new ConfigService();
 
 async function execute(interaction) {
+   console.log("here");
    const prefix = interaction.options.getString("prefix");
 
    if (await configService.setPrefixByGuildId(interaction.guildId, prefix)) {

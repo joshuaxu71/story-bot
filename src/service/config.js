@@ -9,9 +9,11 @@ class ConfigService {
    }
 
    async setPrefixByGuildId(guildId, prefix) {
+      console.log("here1");
       const configRepository = await ConfigRepository.getInstance();
       prefix += " "; // Add space so that there's a space between prefix and input
       const update = { $set: { prefix: prefix } };
+      console.log("here2");
       return await configRepository.updateConfigByGuildId(guildId, update);
    }
 
