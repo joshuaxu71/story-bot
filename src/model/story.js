@@ -1,7 +1,6 @@
 class Story {
    guildId;
    guildStoryIdentifier;
-   channelId;
    replyId;
    title;
    archived = false;
@@ -11,7 +10,6 @@ class Story {
 
    constructor(storyInput) {
       this.guildId = storyInput.guildId;
-      this.channelId = storyInput.channelId;
       this.lastModifiedBy = storyInput.userId;
    }
 }

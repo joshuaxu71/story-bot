@@ -1,7 +1,6 @@
 class StoryInput {
    storyId;
    guildId;
-   channelId;
    userId;
    username;
    message;
@@ -9,7 +8,6 @@ class StoryInput {
 
    constructor(message) {
       this.guildId = message.guildId;
-      this.channelId = message.channelId;
       this.userId = message.author.id;
       this.username = message.author.username;
       this.message = message.content;

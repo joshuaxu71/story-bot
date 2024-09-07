@@ -20,7 +20,7 @@ class StoryInputService {
 
       // If config was null, create config now
       if (!config) {
-         config = await configRepository.insertConfig(message.guildId, message.channelId);
+         config = await configRepository.insertConfig(message.guildId);
       }
 
       if (!this.#isLanguageValid(message, config.languages)) {

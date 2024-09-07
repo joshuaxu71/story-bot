@@ -22,9 +22,9 @@ class ConfigRepository {
       this.collection = await getDatabaseCollection(this.collectionName);
    }
 
-   async insertConfig(guildId, channelId) {
+   async insertConfig(guildId) {
       return executeWithCatch("insertConfig", async () => {
-         const config = new Config(guildId, channelId);
+         const config = new Config(guildId);
          await this.collection.insertOne(config);
          return config;
       });
@@ -32,10 +32,7 @@ class ConfigRepository {
 
    async updateConfigByGuildId(guildId, update) {
       return executeWithCatch("updateConfigByGuildId", async () => {
-         return await this.collection.findOneAndUpdate(
-            { guildId: guildId },
-            update
-         );
+         return await this.collection.findOneAndUpdate({ guildId: guildId }, update);
       });
    }
 
