@@ -1,8 +1,17 @@
 const { SlashCommandBuilder } = require("discord.js");
 
+const { withBanCheck } = require("@auth/auth.js");
 const ConfigService = require("@service/config.js");
 
 const configService = new ConfigService();
+
+async function execute(interaction) {
+   const suffix = interaction.options.getString("suffix");
+
+   if (await configService.setEndingSuffixByGuildId(interaction.guildId, suffix)) {
+      await interaction.reply(`Ending suffix has been configured successfully.`);
+   }
+}
 
 module.exports = {
    data: new SlashCommandBuilder()
@@ -11,11 +20,5 @@ module.exports = {
       .addStringOption((option) =>
          option.setName("suffix").setDescription("Suffix to end the story").setRequired(true)
       ),
-   async execute(interaction) {
-      const suffix = interaction.options.getString("suffix");
-
-      if (await configService.setEndingSuffixByGuildId(interaction.guildId, suffix)) {
-         await interaction.reply(`Ending suffix has been configured successfully.`);
-      }
-   },
+   execute: withBanCheck(execute),
 };

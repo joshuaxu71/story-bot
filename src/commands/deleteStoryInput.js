@@ -1,8 +1,17 @@
 const { SlashCommandBuilder } = require("discord.js");
 
+const { withBanCheck } = require("@auth/auth.js");
 const StoryInputService = require("@service/storyInput.js");
 
 const storyInputService = new StoryInputService();
+
+async function execute(interaction) {
+   const storyInputId = interaction.options.getString("storyinputid");
+
+   if (await storyInputService.deleteStoryInputById(storyInputId)) {
+      await interaction.reply(`Story input been deleted successfully.`);
+   }
+}
 
 module.exports = {
    data: new SlashCommandBuilder()
@@ -14,11 +23,5 @@ module.exports = {
             .setDescription("ID of the story input to be deleted")
             .setRequired(true)
       ),
-   async execute(interaction) {
-      const storyInputId = interaction.options.getString("storyinputid");
-
-      if (await storyInputService.deleteStoryInputById(storyInputId)) {
-         await interaction.reply(`Story input been deleted successfully.`);
-      }
-   },
+   execute: withBanCheck(execute),
 };
