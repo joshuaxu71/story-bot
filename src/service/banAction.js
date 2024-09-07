@@ -34,6 +34,16 @@ class BanActionService {
       const banActionRepository = await BanActionRepository.getInstance();
       return await banActionRepository.getCurrentBansByGuildId(guildId);
    }
+
+   async getBanActionsByGuildId(guildId) {
+      const banActionRepository = await BanActionRepository.getInstance();
+      return await banActionRepository.getBanActionsByGuildId(guildId);
+   }
+
+   async getBanActionsByGuildIdAndUserId(guildId, userId) {
+      const banActionRepository = await BanActionRepository.getInstance();
+      return await banActionRepository.getBanActionsByGuildIdAndUserId(guildId, userId);
+   }
 }
 
 module.exports = BanActionService;

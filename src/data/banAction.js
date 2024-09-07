@@ -42,12 +42,6 @@ class BanActionRepository {
       });
    }
 
-   async getBanActionsByGuildId(guildId) {
-      return executeWithCatch("getBanActionsByGuildId", async () => {
-         return await this.collection.find({ guildId: guildId }).sort({ createdDate: 1 }).toArray();
-      });
-   }
-
    async getCurrentBansByGuildId(guildId) {
       return executeWithCatch("getCurrentBansByGuildId", async () => {
          return await this.collection
@@ -65,6 +59,12 @@ class BanActionRepository {
                { $sort: { createdDate: 1 } },
             ])
             .toArray();
+      });
+   }
+
+   async getBanActionsByGuildId(guildId) {
+      return executeWithCatch("getBanActionsByGuildId", async () => {
+         return await this.collection.find({ guildId: guildId }).sort({ createdDate: 1 }).toArray();
       });
    }
 
