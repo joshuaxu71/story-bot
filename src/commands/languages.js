@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { withBanCheck } = require("@auth/auth.js");
+const { withPermissionAndBanCheck } = require("@auth/auth.js");
 const ConfigService = require("@service/config.js");
 
 const configService = new ConfigService();
@@ -28,5 +28,5 @@ module.exports = {
                { name: "Any", value: "ANY" }
             )
       ),
-   execute: withBanCheck(execute),
+   execute: withPermissionAndBanCheck(execute),
 };

@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { withBanCheck } = require("@auth/auth.js");
+const { withPermissionAndBanCheck } = require("@auth/auth.js");
 const ConfigService = require("@service/config.js");
 const StoryService = require("@service/story.js");
 const StoryInputService = require("@service/storyInput.js");
@@ -20,5 +20,5 @@ module.exports = {
    data: new SlashCommandBuilder()
       .setName("reset")
       .setDescription("Removes all data related to the guild."),
-   execute: withBanCheck(execute),
+   execute: withPermissionAndBanCheck(execute),
 };

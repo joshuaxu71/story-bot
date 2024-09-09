@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { withBanCheck } = require("@auth/auth.js");
+const { withPermissionAndBanCheck } = require("@auth/auth.js");
 const StoryInputService = require("@service/storyInput.js");
 
 const storyInputService = new StoryInputService();
@@ -23,5 +23,5 @@ module.exports = {
             .setDescription("ID of the story input to be deleted")
             .setRequired(true)
       ),
-   execute: withBanCheck(execute),
+   execute: withPermissionAndBanCheck(execute),
 };

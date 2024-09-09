@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { withBanCheck } = require("@auth/auth.js");
+const { withPermissionAndBanCheck } = require("@auth/auth.js");
 const StoryService = require("@service/story.js");
 
 const storyService = new StoryService();
@@ -25,5 +25,5 @@ module.exports = {
             .setDescription("New title of the story to be archived")
             .setRequired(true)
       ),
-   execute: withBanCheck(execute),
+   execute: withPermissionAndBanCheck(execute),
 };

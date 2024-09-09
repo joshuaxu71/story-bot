@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { withBanCheck, invalidateBanCache } = require("@auth/auth.js");
+const { withPermissionAndBanCheck, invalidateBanCache } = require("@auth/auth.js");
 const BanActionService = require("@service/banAction.js");
 const { BanAction, BanType } = require("@model/banAction.js");
 
@@ -44,5 +44,5 @@ module.exports = {
             .setDescription("The note for the ban, could write the reason here")
             .setRequired(false)
       ),
-   execute: withBanCheck(execute),
+   execute: withPermissionAndBanCheck(execute),
 };

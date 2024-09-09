@@ -1,5 +1,8 @@
 const BanActionRepository = require("@data/banAction.js");
+const PermissionService = require("@service/permission.js");
 const { BanType } = require("@model/banAction.js");
+
+const permissionService = new PermissionService();
 
 const cache = new Map(); // In-memory cache
 
@@ -49,6 +52,33 @@ function withBanCheck(handler) {
    };
 }
 
+function withPermissionAndBanCheck(handler) {
+   return async function (interaction) {
+      if (
+         await isUserInsufficientPermission(
+            interaction.client,
+            interaction.guildId,
+            interaction.user.id
+         )
+      ) {
+         return await interaction.reply({
+            content: "You have insufficient permission to execute this command.",
+            ephemeral: true,
+         });
+      }
+
+      if (await isUserBanned(interaction.guildId, interaction.user.id)) {
+         return await interaction.reply({
+            content: "You are banned from interacting with the bot.",
+            ephemeral: true,
+         });
+      }
+
+      // Proceed with the original handler if not banned
+      return handler(interaction);
+   };
+}
+
 async function isUserBanned(guildId, userId) {
    const cachedBan = getCachedBan(guildId, userId);
    if (cachedBan !== null) {
@@ -70,8 +100,28 @@ async function isUserBanned(guildId, userId) {
    return isBanned;
 }
 
+async function isUserInsufficientPermission(client, guildId, userId) {
+   const guild = await client.guilds.fetch(guildId);
+   const member = await guild.members.fetch(userId);
+
+   if (member.permissions.has("ADMINISTRATOR")) {
+      return false;
+   }
+
+   const roles = member.roles.cache;
+   for (const role of roles) {
+      const permission = await permissionService.getPermissionByGuildIdAndRoleId(guildId, role[0]);
+      if (permission && permission.type === "ADMINISTRATOR") {
+         return false;
+      }
+   }
+
+   return true;
+}
+
 module.exports = {
    withBanCheck,
+   withPermissionAndBanCheck,
    isUserBanned,
    invalidateBanCache,
 };

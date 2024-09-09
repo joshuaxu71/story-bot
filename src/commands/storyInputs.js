@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { withBanCheck } = require("@auth/auth.js");
+const { withPermissionAndBanCheck } = require("@auth/auth.js");
 const StoryInputService = require("@service/storyInput.js");
 
 const storyInputService = new StoryInputService();
@@ -43,5 +43,5 @@ module.exports = {
             )
             .setRequired(false)
       ),
-   execute: withBanCheck(execute),
+   execute: withPermissionAndBanCheck(execute),
 };

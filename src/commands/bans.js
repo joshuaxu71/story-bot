@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { withBanCheck } = require("@auth/auth.js");
+const { withPermissionAndBanCheck } = require("@auth/auth.js");
 const BanActionService = require("@service/banAction.js");
 
 const banActionService = new BanActionService();
@@ -31,5 +31,5 @@ module.exports = {
    data: new SlashCommandBuilder()
       .setName("bans")
       .setDescription("Lists the banned users and related information."),
-   execute: withBanCheck(execute),
+   execute: withPermissionAndBanCheck(execute),
 };

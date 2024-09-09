@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { withBanCheck } = require("@auth/auth.js");
+const { withPermissionAndBanCheck } = require("@auth/auth.js");
 const PermissionService = require("@service/permission.js");
 
 const permissionService = new PermissionService();
@@ -31,5 +31,5 @@ module.exports = {
             .setDescription("The role whose permission is to be revoked")
             .setRequired(true)
       ),
-   execute: withBanCheck(execute),
+   execute: withPermissionAndBanCheck(execute),
 };
