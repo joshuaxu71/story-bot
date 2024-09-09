@@ -9,32 +9,52 @@ const cache = new Map(); // In-memory cache
 // Cache configuration
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 1 day
 
-function getCacheKey(guildId, userId) {
-   return `${guildId}-${userId}`;
+function getBanCacheKey(guildId, userId) {
+   return `ban-${guildId}-${userId}`;
+}
+function getPermissionCacheKey(guildId, roleId) {
+   return `permission-${guildId}-${roleId}`;
 }
 
 // Get cache entry
 function getCachedBan(guildId, userId) {
-   const cacheKey = getCacheKey(guildId, userId);
+   const cacheKey = getBanCacheKey(guildId, userId);
    const cachedBan = cache.get(cacheKey);
 
    if (cachedBan && Date.now() - cachedBan.timestamp < CACHE_TTL) {
       return cachedBan.isBanned;
    }
 
-   // Cache entry expired or not found
+   return null;
+}
+function getCachedPermission(guildId, roleId) {
+   const cacheKey = getPermissionCacheKey(guildId, roleId);
+   const cachedPermission = cache.get(cacheKey);
+
+   if (cachedPermission && Date.now() - cachedPermission.timestamp < CACHE_TTL) {
+      return cachedPermission;
+   }
+
    return null;
 }
 
 // Set cache entry
 function setBanCache(guildId, userId, isBanned) {
-   const cacheKey = getCacheKey(guildId, userId);
+   const cacheKey = getBanCacheKey(guildId, userId);
    cache.set(cacheKey, { isBanned, timestamp: Date.now() });
+}
+function setPermissionCache(guildId, roleId, type) {
+   const cacheKey = getPermissionCacheKey(guildId, roleId);
+   cache.set(cacheKey, { type: type, timestamp: Date.now() });
 }
 
 // Invalidate cache entry
 function invalidateBanCache(guildId, userId) {
-   const cacheKey = getCacheKey(guildId, userId);
+   const cacheKey = getBanCacheKey(guildId, userId);
+   cache.delete(cacheKey);
+}
+function invalidatePermissionCache(guildId, roleId) {
+   const cacheKey = getPermissionCacheKey(guildId, roleId);
    cache.delete(cacheKey);
 }
 
@@ -110,7 +130,18 @@ async function isUserInsufficientPermission(client, guildId, userId) {
 
    const roles = member.roles.cache;
    for (const role of roles) {
-      const permission = await permissionService.getPermissionByGuildIdAndRoleId(guildId, role[0]);
+      const roleId = role[0];
+
+      let permission = getCachedPermission(guildId, roleId);
+      if (permission === null) {
+         permission = await permissionService.getPermissionByGuildIdAndRoleId(guildId, roleId);
+         if (permission) {
+            setPermissionCache(guildId, roleId, permission.type);
+         } else {
+            setPermissionCache(guildId, roleId, null);
+         }
+      }
+
       if (permission && permission.type === "ADMINISTRATOR") {
          return false;
       }
@@ -124,4 +155,5 @@ module.exports = {
    withPermissionAndBanCheck,
    isUserBanned,
    invalidateBanCache,
+   invalidatePermissionCache,
 };

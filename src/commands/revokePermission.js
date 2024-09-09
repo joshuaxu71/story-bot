@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { withPermissionAndBanCheck } = require("@auth/auth.js");
+const { withPermissionAndBanCheck, invalidatePermissionCache } = require("@auth/auth.js");
 const PermissionService = require("@service/permission.js");
 
 const permissionService = new PermissionService();
@@ -19,6 +19,7 @@ async function execute(interaction) {
          ephemeral: true,
       });
    }
+   invalidatePermissionCache(interaction.guildId, role.id);
 }
 
 module.exports = {
