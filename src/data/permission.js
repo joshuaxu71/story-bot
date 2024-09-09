@@ -1,5 +1,4 @@
 const { getDatabaseCollection, executeWithCatch } = require("@data/mongo.js");
-const { BanType } = require("@model/permission.js");
 
 class PermissionRepository {
    constructor() {
@@ -38,6 +37,16 @@ class PermissionRepository {
    async getPermissionByGuildIdAndRoleId(guildId, roleId) {
       return executeWithCatch("getPermissionByGuildIdAndRoleId", async () => {
          return await this.collection.findOne({ guildId: guildId, roleId: roleId });
+      });
+   }
+
+   async getPermissionsByGuildId(guildId) {
+      return executeWithCatch("getPermissionsByGuildId", async () => {
+         const permissions = await this.collection
+            .find({ guildId: guildId })
+            .sort({ _id: 1 })
+            .toArray();
+         return permissions;
       });
    }
 }

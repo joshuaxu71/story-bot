@@ -33,6 +33,11 @@ class PermissionService {
       const permissionRepository = await PermissionRepository.getInstance();
       return await permissionRepository.getPermissionByGuildIdAndRoleId(guildId, roleId);
    }
+
+   async getPermissionsByGuildId(guildId) {
+      const permissionRepository = await PermissionRepository.getInstance();
+      return await permissionRepository.getPermissionsByGuildId(guildId);
+   }
 }
 
 module.exports = PermissionService;
