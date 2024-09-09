@@ -1,7 +1,8 @@
-const BanActionRepository = require("@data/banAction.js");
+const BanActionService = require("@service/banAction.js");
 const PermissionService = require("@service/permission.js");
 const { BanType } = require("@model/banAction.js");
 
+const banActionService = new BanActionService();
 const permissionService = new PermissionService();
 
 const cache = new Map(); // In-memory cache
@@ -105,9 +106,7 @@ async function isUserBanned(guildId, userId) {
       return cachedBan;
    }
 
-   const banActionRepository = await BanActionRepository.getInstance();
-
-   const latestBanAction = await banActionRepository.getLatestBanActionByGuildIdAndUserId(
+   const latestBanAction = await banActionService.getLatestBanActionByGuildIdAndUserId(
       guildId,
       userId
    );

@@ -30,6 +30,11 @@ class BanActionService {
       }
    }
 
+   async getLatestBanActionByGuildIdAndUserId(guildId, userId) {
+      const banActionRepository = await BanActionRepository.getInstance();
+      return await banActionRepository.getLatestBanActionByGuildIdAndUserId(guildId, userId);
+   }
+
    async getCurrentBansByGuildId(guildId) {
       const banActionRepository = await BanActionRepository.getInstance();
       return await banActionRepository.getCurrentBansByGuildId(guildId);
