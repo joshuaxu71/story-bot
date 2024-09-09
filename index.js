@@ -15,6 +15,7 @@ const storyInputService = new StoryInputService();
 const client = new Client({
    intents: [
       GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildMembers,
       GatewayIntentBits.GuildMessages,
       GatewayIntentBits.MessageContent,
    ],
@@ -58,7 +59,7 @@ client.on("messageCreate", async (message) => {
             repliedUser: false,
          },
       });
-      await storyService.setStoryReplyId(client, story, reply.id);
+      await storyService.replaceStoryReply(client, story, reply);
 
       const endStoryResult = await storyService.endStory(message, story);
       if (endStoryResult) {

@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { withBanCheck } = require("@auth/auth.js");
+const { withPermissionAndBanCheck } = require("@auth/auth.js");
 const BanActionService = require("@service/banAction.js");
 
 const banActionService = new BanActionService();
@@ -41,5 +41,5 @@ module.exports = {
             .setDescription("The user whose ban history you want to view")
             .setRequired(true)
       ),
-   execute: withBanCheck(execute),
+   execute: withPermissionAndBanCheck(execute),
 };

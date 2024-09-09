@@ -49,9 +49,9 @@ class StoryService {
       return await storyRepository.getStoriesByGuildId(guildId);
    }
 
-   async setStoryReplyId(client, story, messageId) {
-      await this.#removePreviousStoryReply(client, story.channelId, story.replyId);
-      await this.#updateStoryReplyId(story._id, messageId);
+   async replaceStoryReply(client, story, reply) {
+      await this.#removePreviousStoryReply(client, story.replyChannelId, story.replyId);
+      await this.#updateStoryReplyId(story._id, reply.channelId, reply.id);
    }
 
    async endStory(message, story) {
@@ -97,15 +97,15 @@ class StoryService {
       return `The ongoing story has been archived with the title \`${title}\``;
    }
 
-   async #updateStoryReplyId(storyId, messageId) {
+   async #updateStoryReplyId(storyId, replyChannelId, replyId) {
       const storyRepository = await StoryRepository.getInstance();
-      const update = { $set: { replyId: messageId } };
+      const update = { $set: { replyChannelId: replyChannelId, replyId: replyId } };
       return await storyRepository.updateStoryById(storyId, update);
    }
 
-   async #removePreviousStoryReply(client, channelId, replyId) {
+   async #removePreviousStoryReply(client, replyChannelId, replyId) {
       try {
-         const channel = await client.channels.fetch(channelId);
+         const channel = await client.channels.fetch(replyChannelId);
          const message = await channel.messages.fetch(replyId);
          await message.delete();
       } catch (err) {
