@@ -49,4 +49,4 @@ jobs:
                  docker pull ${{ secrets.DOCKER_USERNAME }}/story-weaver:latest
                  docker stop story-weaver || true
                  docker rm story-weaver || true
-                 docker run -d -p 80:3000 --name story-weaver ${{ secrets.DOCKER_USERNAME }}/story-weaver:latest
+                 docker run -d -p 80:3000 --name story-weaver -env-file .env ${{ secrets.DOCKER_USERNAME }}/story-weaver:latest
