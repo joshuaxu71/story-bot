@@ -39,7 +39,7 @@ class StoryRepository {
    }
 
    async updateStoryById(id, update) {
-      return executeWithCatch("updateConfigByGuildId", async () => {
+      return executeWithCatch("updateStoryById", async () => {
          return await this.collection.findOneAndUpdate({ _id: id }, update);
       });
    }

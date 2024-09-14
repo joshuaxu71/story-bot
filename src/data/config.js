@@ -30,9 +30,9 @@ class ConfigRepository {
       });
    }
 
-   async updateConfigByGuildId(guildId, update) {
-      return executeWithCatch("updateConfigByGuildId", async () => {
-         return await this.collection.findOneAndUpdate({ guildId: guildId }, update);
+   async updateConfigById(id, update) {
+      return executeWithCatch("updateConfigById", async () => {
+         return await this.collection.findOneAndUpdate({ _id: id }, update);
       });
    }
 
