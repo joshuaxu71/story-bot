@@ -21,8 +21,5 @@
       "@data": "src/data",
       "@model": "src/model",
       "@service": "src/service"
-   },
-   "devDependencies": {
-      "@flydotio/dockerfile": "^0.5.8"
    }
 }
