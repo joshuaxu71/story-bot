@@ -30,7 +30,6 @@ class ConfigService {
    async setMinStoryInputCharacterCountByGuildId(guildId, minStoryInputCharacterCount) {
       const configRepository = await ConfigRepository.getInstance();
       const config = await this.#getConfigByGuildId(configRepository, guildId);
-      console.log(config);
 
       const update = {
          $set: { minStoryInputCharacterCount: minStoryInputCharacterCount },
